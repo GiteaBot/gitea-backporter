@@ -34,3 +34,7 @@ deno run --allow-net --allow-env --allow-run src/mod.ts
 ## Contributing
 
 Contributions are welcome!
+
+## License
+
+[MIT](LICENSE)
