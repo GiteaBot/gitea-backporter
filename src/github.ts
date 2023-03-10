@@ -82,7 +82,7 @@ export const createBackportPr = async (
         )
       }`,
       base: `release/v${giteaVersion.majorMinorVersion}`,
-      body: `Backport #${originalPr.number} by @${originalPr.user.login}\n\n` + originalPr.body,
+      body: `Backport #${originalPr.number} by @${originalPr.user.login}\n\n${originalPr.body}`,
       maintainer_can_modify: true,
     }),
   });
