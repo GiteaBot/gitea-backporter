@@ -10,7 +10,7 @@ import {
   getMilestones,
 } from "./github.ts";
 
-const run = async () => {
+export const run = async () => {
   if (
     Deno.env.get("BACKPORTER_GITEA_FORK") === undefined ||
     Deno.env.get("BACKPORTER_GITHUB_TOKEN") === undefined
@@ -61,5 +61,3 @@ const parseCandidate = async (candidate, giteaVersion: GiteaVersion) => {
   console.log(`Creating backport PR for #${originalPr.number}`);
   await createBackportPr(originalPr, giteaVersion);
 };
-
-run();

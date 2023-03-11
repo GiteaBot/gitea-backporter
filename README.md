@@ -28,8 +28,11 @@ BACKPORTER_GITEA_FORK= # The fork of go-gitea/gitea to push the backport branch 
 Then run:
 
 ```bash
-deno run --allow-net --allow-env --allow-run src/mod.ts
+deno run --allow-net --allow-env --allow-run src/webhook.ts
 ```
+
+This will spin up a web server on port 8000. You can then set up a webhook on
+`/trigger` to run the automatic backport.
 
 ## Contributing
 
