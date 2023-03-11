@@ -112,15 +112,26 @@ export const createBackportPr = async (
     },
   );
 
-  // set assignees and milestone
+  // set milestone
   await fetch(
     `${GITHUB_API}/repos/go-gitea/gitea/issues/${json.number}`,
     {
       method: "PATCH",
       headers: HEADERS,
       body: JSON.stringify({
-        // assignees: [originalPr.user.login],
         milestone: giteaVersion.milestoneNumber,
+      }),
+    },
+  );
+
+  // set assignee
+  await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/issues/${json.number}`,
+    {
+      method: "PATCH",
+      headers: HEADERS,
+      body: JSON.stringify({
+        assignees: [originalPr.user.login],
       }),
     },
   );
