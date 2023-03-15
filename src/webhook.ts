@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.178.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.179.0/http/server.ts";
 import { triggerBackportAction } from "./github.ts";
 
 if (Deno.env.get("BACKPORTER_GITHUB_TOKEN") === undefined) {
