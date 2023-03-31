@@ -70,6 +70,11 @@ export const createBackportPr = async (
   },
   giteaVersion: GiteaVersion,
 ) => {
+  let prDescription =
+    `Backport #${originalPr.number} by @${originalPr.user.login}`;
+  if (originalPr.body) {
+    prDescription += "\n\n" + originalPr.body;
+  }
   let response = await fetch(`${GITHUB_API}/repos/go-gitea/gitea/pulls`, {
     method: "POST",
     headers: HEADERS,
@@ -82,8 +87,7 @@ export const createBackportPr = async (
         )
       }`,
       base: `release/v${giteaVersion.majorMinorVersion}`,
-      body:
-        `Backport #${originalPr.number} by @${originalPr.user.login}\n\n${originalPr.body}`,
+      body: prDescription,
       maintainer_can_modify: true,
     }),
   });
