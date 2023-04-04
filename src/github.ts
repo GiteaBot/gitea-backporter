@@ -65,10 +65,7 @@ export const getMilestones = async (): Promise<Milestone[]> => {
   // take only the earliest patch version of each minor version (e.g. 1.19.0, 1.19.1, 1.19.2 -> 1.19.0)
   const earliestPatchVersions: Record<string, Milestone> = {};
   for (const milestone of milestones) {
-    const version = semver.parse(milestone.title);
-    if (!version) {
-      continue;
-    }
+    const version = new semver.SemVer(milestone.title);
     const key = `${version.major}.${version.minor}`;
     if (
       !earliestPatchVersions[key] ||
