@@ -49,15 +49,33 @@ export const backportPrExists = async (
   return json.total_count > 0;
 };
 
+type Milestone = { title: string };
+
 // get Gitea milestones
-export const getMilestones = async () => {
+export const getMilestones = async (): Promise<Milestone[]> => {
   const response = await fetch(
     `${GITHUB_API}/repos/go-gitea/gitea/milestones`,
     { headers: HEADERS },
   );
   const json = await response.json();
-  console.log("getMilestones status: " + response.status);
-  return json.filter((m: { title: string }) => semver.valid(m.title));
+  const milestones: Milestone[] = json.filter((m: Milestone) =>
+    semver.valid(m.title)
+  );
+
+  // take only the latest patch version of each minor version
+  const latestPatchVersions: { [key: string]: Milestone } = {};
+  for (const milestone of milestones) {
+    const sv = new semver.SemVer(milestone.title);
+    const key = `${sv.major}.${sv.minor}`;
+    if (
+      !latestPatchVersions[key] ||
+      semver.compare(latestPatchVersions[key].title, milestone.title) < 0
+    ) {
+      latestPatchVersions[key] = milestone;
+    }
+  }
+
+  return Object.values(latestPatchVersions);
 };
 
 export const createBackportPr = async (
