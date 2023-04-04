@@ -62,20 +62,23 @@ export const getMilestones = async (): Promise<Milestone[]> => {
     semver.valid(m.title)
   );
 
-  // take only the latest patch version of each minor version
-  const latestPatchVersions: { [key: string]: Milestone } = {};
+  // take only the earliest patch version of each minor version (e.g. 1.19.0, 1.19.1, 1.19.2 -> 1.19.0)
+  const earliestPatchVersions: Record<string, Milestone> = {};
   for (const milestone of milestones) {
-    const sv = new semver.SemVer(milestone.title);
-    const key = `${sv.major}.${sv.minor}`;
+    const version = semver.parse(milestone.title);
+    if (!version) {
+      continue;
+    }
+    const key = `${version.major}.${version.minor}`;
     if (
-      !latestPatchVersions[key] ||
-      semver.compare(latestPatchVersions[key].title, milestone.title) < 0
+      !earliestPatchVersions[key] ||
+      semver.lt(milestone.title, earliestPatchVersions[key].title)
     ) {
-      latestPatchVersions[key] = milestone;
+      earliestPatchVersions[key] = milestone;
     }
   }
 
-  return Object.values(latestPatchVersions);
+  return Object.values(earliestPatchVersions);
 };
 
 export const createBackportPr = async (
