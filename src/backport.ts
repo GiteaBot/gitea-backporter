@@ -11,15 +11,6 @@ import {
 } from "./github.ts";
 
 export const run = async () => {
-  if (
-    Deno.env.get("BACKPORTER_GITEA_FORK") === undefined ||
-    Deno.env.get("BACKPORTER_GITHUB_TOKEN") === undefined
-  ) {
-    console.log(
-      "BACKPORTER_GITEA_FORK and BACKPORTER_GITHUB_TOKEN must be set",
-    );
-    return;
-  }
   await initializeGitRepo();
   const milestones = await getMilestones();
   for (const milestone of milestones) {
