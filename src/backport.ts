@@ -6,6 +6,7 @@ import {
   backportPrExists,
   createBackportPr,
   fetchCandidates,
+  fetchCurrentUser,
   fetchPr,
   getMilestones,
 } from "./github.ts";
@@ -20,7 +21,8 @@ export const run = async () => {
     );
     return;
   }
-  await initializeGitRepo();
+  const user = await fetchCurrentUser();
+  await initializeGitRepo(user.login, user.email);
   const milestones = await getMilestones();
   for (const milestone of milestones) {
     console.log(`Processing milestone ${milestone.title}`);

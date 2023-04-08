@@ -8,6 +8,12 @@ const HEADERS = {
   Authorization: `Bearer ${Deno.env.get("BACKPORTER_GITHUB_TOKEN")}`,
 };
 
+// return the current user
+export const fetchCurrentUser = async () => {
+  const response = await fetch(`${GITHUB_API}/user`, { headers: HEADERS });
+  return response.json();
+};
+
 // returns a list of PRs that are merged and have the backport label for the current Gitea version
 export const fetchCandidates = async (giteaMajorMinorVersion: string) => {
   const response = await fetch(

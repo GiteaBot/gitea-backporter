@@ -3,7 +3,7 @@ export const getPrBranchName = (
   giteaMajorMinorVersion: string,
 ) => `backport-${prNumber}-v${giteaMajorMinorVersion}`;
 
-export const initializeGitRepo = async () => {
+export const initializeGitRepo = async (user: string, email: string | null) => {
   await Deno.run({
     cmd: [
       "git",
@@ -22,6 +22,21 @@ export const initializeGitRepo = async () => {
       "upstream",
       "https://github.com/go-gitea/gitea.git",
     ],
+  }).status();
+
+  // set the user name and email
+  await Deno.run({
+    cwd: "gitea",
+    cmd: ["git", "config", "user.name", user],
+  }).status();
+  // the email might be null if the token doesn't have the user scope,
+  // see https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#get-the-authenticated-user
+  if (!email) {
+    email = "teabot@gitea.io";
+  }
+  await Deno.run({
+    cwd: "gitea",
+    cmd: ["git", "config", "user.email", email],
   }).status();
 };
 
