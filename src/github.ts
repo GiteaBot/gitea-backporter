@@ -24,12 +24,12 @@ export const fetchCandidates = async (giteaMajorMinorVersion: string) => {
   return json;
 };
 
-// returns a list of PRs that are merged and have the reviewed/wait-merge
-export const fetchMergedWithReviewedWaitMerge = async () => {
+// returns a list of PRs that are merged and have the given label
+export const fetchMergedWithLabel = async (label: string) => {
   const response = await fetch(
     `${GITHUB_API}/search/issues?q=` +
       encodeURIComponent(
-        `is:pr is:merged label:reviewed/wait-merge repo:go-gitea/gitea`,
+        `is:pr is:merged label:${label} repo:go-gitea/gitea`,
       ),
     { headers: HEADERS },
   );
@@ -37,10 +37,13 @@ export const fetchMergedWithReviewedWaitMerge = async () => {
   return json;
 };
 
-// given a PR number (that was merged and has the reviewed/wait-merge label), remove the label
-export const removeReviewedWaitMergeLabel = async (prNumber: number) => {
+// given a PR number that has the given label, remove the label
+export const removeLabel = async (
+  prNumber: number,
+  label: string,
+) => {
   const response = await fetch(
-    `${GITHUB_API}/repos/go-gitea/gitea/issues/${prNumber}/labels/reviewed/wait-merge`,
+    `${GITHUB_API}/repos/go-gitea/gitea/issues/${prNumber}/labels/${label}`,
     { method: "DELETE", headers: HEADERS },
   );
   return response;
