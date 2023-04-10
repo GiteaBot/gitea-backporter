@@ -84,7 +84,8 @@ const getPrApprovers = async (prNumber: number) => {
     { headers: HEADERS },
   );
   const json = await response.json();
-  return json.filter((review: { state: string }) => review.state === "APPROVED")
+  return json
+    .filter((review: { state: string }) => review.state === "APPROVED")
     .map((r: { user: { login: string } }) => r.user.login);
 };
 
