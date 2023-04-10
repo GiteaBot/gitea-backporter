@@ -30,6 +30,31 @@ export const fetchCandidates = async (giteaMajorMinorVersion: string) => {
   return json;
 };
 
+// returns a list of PRs that are merged and have the given label
+export const fetchMergedWithLabel = async (label: string) => {
+  const response = await fetch(
+    `${GITHUB_API}/search/issues?q=` +
+      encodeURIComponent(
+        `is:pr is:merged label:${label} repo:go-gitea/gitea`,
+      ),
+    { headers: HEADERS },
+  );
+  const json = await response.json();
+  return json;
+};
+
+// given a PR number that has the given label, remove the label
+export const removeLabel = async (
+  prNumber: number,
+  label: string,
+) => {
+  const response = await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/issues/${prNumber}/labels/${label}`,
+    { method: "DELETE", headers: HEADERS },
+  );
+  return response;
+};
+
 // returns the PR
 export const fetchPr = async (prNumber: number) => {
   const response = await fetch(
@@ -82,6 +107,17 @@ export const getMilestones = async (): Promise<Milestone[]> => {
   }
 
   return Object.values(earliestPatchVersions);
+};
+
+const getPrApprovers = async (prNumber: number) => {
+  const response = await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/issues/${prNumber}/reviews`,
+    { headers: HEADERS },
+  );
+  const json = await response.json();
+  return json
+    .filter((review: { state: string }) => review.state === "APPROVED")
+    .map((r: { user: { login: string } }) => r.user.login);
 };
 
 export const createBackportPr = async (
@@ -164,6 +200,17 @@ export const createBackportPr = async (
     },
   );
 
+  // request review from original PR approvers
+  const approvers = await getPrApprovers(originalPr.number);
+  await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/pulls/${json.number}/requested_reviewers`,
+    {
+      method: "POST",
+      headers: HEADERS,
+      body: JSON.stringify({ reviewers: approvers }),
+    },
+  );
+
   // if the original PR had exactly one backport/* label, add the backport/done label to it
   const backportLabels = originalPr.labels
     .filter((label) => label.name.startsWith("backport/"));
@@ -200,20 +247,4 @@ export const addPrComment = async (prNumber: number, comment: string) => {
   console.log(
     `Added backport comment to PR #${prNumber}`,
   );
-};
-
-// trigger GitHub action using workflow_dispatch
-export const triggerBackportAction = async () => {
-  const response = await fetch(
-    `${GITHUB_API}/repos/GiteaBot/gitea-backporter/actions/workflows/backport.yml/dispatches`,
-    {
-      method: "POST",
-      headers: HEADERS,
-      body: JSON.stringify({ ref: "main" }),
-    },
-  );
-  if (!response.ok) {
-    throw new Error(`Failed to trigger backport action: ${response.status}`);
-  }
-  console.log(`Triggered backport action`);
 };
