@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.182.0/http/server.ts";
 import * as backport from "./backport.ts";
 import * as labels from "./labels.ts";
+import * as mergeQueue from "./mergeQueue.ts";
 
 if (
   Deno.env.get("BACKPORTER_GITEA_FORK") === undefined ||
@@ -15,8 +16,10 @@ serve((req: Request) => {
   if (req.url.endsWith("/trigger")) {
     backport.run();
     labels.run();
+    mergeQueue.run();
     return Response.json({
-      message: "Triggered backport and label maintenance",
+      message:
+        "Triggered backport, label maintenance, and merge queue PRs sync",
     });
   } else {
     return Response.json({ status: "OK" });

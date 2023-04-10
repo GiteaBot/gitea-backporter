@@ -43,6 +43,34 @@ export const fetchMergedWithLabel = async (label: string) => {
   return json;
 };
 
+// returns a list of PRs pending merge (have the label reviewed/wait-merge)
+export const fetchPendingMerge = async () => {
+  const response = await fetch(
+    `${GITHUB_API}/search/issues?q=` +
+      encodeURIComponent(
+        `is:pr is:open label:reviewed/wait-merge repo:go-gitea/gitea`,
+      ),
+    { headers: HEADERS },
+  );
+  const json = await response.json();
+  return json;
+};
+
+// update a given PR with the latest upstream changes by merging HEAD from
+// the base branch into the pull request branch
+export const updatePr = async (prNumber: number): Promise<Response> => {
+  const pr = await fetchPr(prNumber);
+  const response = await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/update-branch`,
+    {
+      method: "PUT",
+      headers: HEADERS,
+      body: JSON.stringify({ expected_head_sha: pr.head.sha }),
+    },
+  );
+  return response;
+};
+
 // given a PR number that has the given label, remove the label
 export const removeLabel = async (
   prNumber: number,
