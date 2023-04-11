@@ -137,15 +137,19 @@ export const getMilestones = async (): Promise<Milestone[]> => {
   return Object.values(earliestPatchVersions);
 };
 
-const getPrApprovers = async (prNumber: number) => {
+export const getPrApprovers = async (prNumber: number) => {
   const response = await fetch(
-    `${GITHUB_API}/repos/go-gitea/gitea/issues/${prNumber}/reviews`,
+    `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/reviews`,
     { headers: HEADERS },
   );
   const json = await response.json();
-  return json
+
+  const approvers = json
     .filter((review: { state: string }) => review.state === "APPROVED")
     .map((r: { user: { login: string } }) => r.user.login);
+
+  // return unique approvers
+  return [...new Set(approvers)];
 };
 
 export const createBackportPr = async (
