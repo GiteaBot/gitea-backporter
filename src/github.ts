@@ -48,7 +48,7 @@ export const fetchPendingMerge = async () => {
   const response = await fetch(
     `${GITHUB_API}/search/issues?q=` +
       encodeURIComponent(
-        `is:pr is:open label:reviewed/wait-merge repo:go-gitea/gitea`,
+        `is:pr is:open label:reviewed/wait-merge sort:created-asc repo:go-gitea/gitea`,
       ),
     { headers: HEADERS },
   );
