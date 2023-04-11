@@ -3,8 +3,16 @@ export const run = async () => {
   // fetch all PRs that are pending merge
   const pendingMerge = await fetchPendingMerge();
 
-  // these are sorted by descending PR number, take the first 3 and update them
-  const prs = pendingMerge.items.slice(0, 3);
+  // take the first PR in each milestone
+  const milestoneToPr = new Map();
+  for (const pr of pendingMerge.items) {
+    if (!milestoneToPr.has(pr.milestone.title)) {
+      milestoneToPr.set(pr.milestone.title, pr);
+    }
+  }
+
+  // update the PRs
+  const prs = Array.from(milestoneToPr.values());
   return Promise.all(prs.map(async (pr: { number: number }) => {
     const response = await updatePr(pr.number);
     if (response.ok) {
