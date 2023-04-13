@@ -1,4 +1,4 @@
-import { SemVer } from "https://deno.land/std@0.182.0/semver/mod.ts";
+import { SemVer } from "https://deno.land/std@0.183.0/semver/mod.ts";
 
 export class GiteaVersion {
   majorMinorVersion: string;
