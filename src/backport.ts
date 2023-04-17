@@ -1,5 +1,5 @@
 import { cherryPickPr, initializeGitRepo } from "./git.ts";
-import { GiteaVersion } from "./giteaVersion.ts";
+import { fetchGiteaVersions, GiteaVersion } from "./giteaVersion.ts";
 import {
   addLabels,
   addPrComment,
@@ -8,16 +8,12 @@ import {
   fetchCandidates,
   fetchCurrentUser,
   fetchPr,
-  getMilestones,
 } from "./github.ts";
 
 export const run = async () => {
   const user = await fetchCurrentUser();
   await initializeGitRepo(user.login, user.email);
-  const milestones = await getMilestones();
-  for (const milestone of milestones) {
-    console.log(`Processing milestone ${milestone.title}`);
-    const giteaVersion = new GiteaVersion(milestone);
+  for (const giteaVersion of await fetchGiteaVersions()) {
     const candidates = await fetchCandidates(giteaVersion.majorMinorVersion);
     for (const candidate of candidates.items) {
       console.log("Parsing #" + candidate.number);

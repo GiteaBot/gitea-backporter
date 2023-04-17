@@ -56,6 +56,19 @@ export const fetchPendingMerge = async () => {
   return json;
 };
 
+// returns a list of PRs that target the given branch
+export const fetchTargeting = async (branch: string) => {
+  const response = await fetch(
+    `${GITHUB_API}/search/issues?q=` +
+      encodeURIComponent(
+        `is:pr base:${branch} repo:go-gitea/gitea`,
+      ),
+    { headers: HEADERS },
+  );
+  const json = await response.json();
+  return json;
+};
+
 // update a given PR with the latest upstream changes by merging HEAD from
 // the base branch into the pull request branch
 export const updatePr = async (prNumber: number): Promise<Response> => {
@@ -108,7 +121,7 @@ export const backportPrExists = async (
   return json.total_count > 0;
 };
 
-type Milestone = { title: string };
+type Milestone = { title: string; number: number };
 
 // get Gitea milestones
 export const getMilestones = async (): Promise<Milestone[]> => {

@@ -22,6 +22,9 @@ original pull request.
 The script will also look for merged pull requests that have the labels
 `reviewed/wait-merge` or `reviewed/prioritize-merge` and remove them.
 
+It will also search for pull requests that target release branches and remove
+any `backport/*` labels from them.
+
 ### Merge queue synchronization
 
 The script will also look for pull requests that have the label

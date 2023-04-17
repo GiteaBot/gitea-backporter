@@ -1,11 +1,15 @@
-import { fetchMergedWithLabel, removeLabel } from "./github.ts";
+import { fetchMergedWithLabel, fetchTargeting, removeLabel } from "./github.ts";
+import { fetchGiteaVersions } from "./giteaVersion.ts";
 
 export const run = async () => {
   const labelsToRemoveAfterMerge = [
     "reviewed/wait-merge",
     "reviewed/prioritize-merge",
   ];
-  await removeLabelsFromMergedPr(labelsToRemoveAfterMerge);
+  await Promise.all([
+    removeLabelsFromMergedPr(labelsToRemoveAfterMerge),
+    removeBackportLabelsFromPrsTargetingReleaseBranches(),
+  ]);
 };
 
 const removeLabelFromMergedPr = async (
@@ -33,4 +37,46 @@ const removeLabelsFromMergedPr = (labels: string[]) => {
       ),
     );
   }));
+};
+
+// for each gitea version, fetch all PRs that target that version and remove the
+// backport/* labels from them
+export const removeBackportLabelsFromPrsTargetingReleaseBranches = async () => {
+  const giteaVersions = await fetchGiteaVersions();
+  // versions
+  return Promise.all(giteaVersions.map(async (version) => {
+    const prs = await fetchTargeting(`release/v${version.majorMinorVersion}`);
+    // PRs
+    return removeBackportLabelsFromPrs(prs.items);
+  }));
+};
+
+// given a list of PRs, removes the backport/* labels from them
+export const removeBackportLabelsFromPrs = (prs) => {
+  return Promise.all(
+    prs.map((pr: {
+      title;
+      labels;
+      number: number;
+    }) =>
+      // labels
+      Promise.all(
+        pr.labels.filter((label: { name: string }) =>
+          label.name.startsWith("backport/")
+        ).map(async (label: { name: string }) => {
+          const response = await removeLabel(pr.number, label.name);
+          if (response.ok) {
+            console.info(
+              `Removed ${label.name} from "${pr.title}" (#${pr.number})`,
+            );
+          } else {
+            console.error(
+              `Failed to remove ${label.name} from "${pr.title}" (#${pr.number})`,
+            );
+            console.error(await response.text());
+          }
+        }),
+      )
+    ),
+  );
 };
