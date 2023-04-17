@@ -19,14 +19,11 @@ export const fetchCandidates = async (giteaMajorMinorVersion: string) => {
   const response = await fetch(
     `${GITHUB_API}/search/issues?q=` +
       encodeURIComponent(
-        `is:pr is:merged label:backport/v${giteaMajorMinorVersion} -label:backport/done -label:backport/manual repo:go-gitea/gitea`,
+        `is:pr is:merged base:main label:backport/v${giteaMajorMinorVersion} -label:backport/done -label:backport/manual repo:go-gitea/gitea`,
       ),
     { headers: HEADERS },
   );
   const json = await response.json();
-  for (const item of json.items) {
-    console.log(`- ${item.title} (#${item.number})`);
-  }
   return json;
 };
 
@@ -184,8 +181,6 @@ export const createBackportPr = async (
     }),
   });
   const json = await response.json();
-  console.log("Created backport PR");
-  console.log(json);
 
   // filter lgtm/*, backport/* and reviewed/* labels
   const labels = originalPr.labels

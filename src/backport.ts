@@ -16,7 +16,6 @@ export const run = async () => {
   await initializeGitRepo(user.login, user.email);
   const milestones = await getMilestones();
   for (const milestone of milestones) {
-    console.log(`Processing milestone ${milestone.title}`);
     const giteaVersion = new GiteaVersion(milestone);
     const candidates = await fetchCandidates(giteaVersion.majorMinorVersion);
     for (const candidate of candidates.items) {
