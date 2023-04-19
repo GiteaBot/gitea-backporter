@@ -53,30 +53,29 @@ export const removeBackportLabelsFromPrsTargetingReleaseBranches = async () => {
 
 // given a list of PRs, removes the backport/* labels from them
 export const removeBackportLabelsFromPrs = (prs) => {
-  return Promise.all(
-    prs.map((pr: {
-      title;
-      labels;
-      number: number;
-    }) =>
-      // labels
-      Promise.all(
-        pr.labels.filter((label: { name: string }) =>
-          label.name.startsWith("backport/")
-        ).map(async (label: { name: string }) => {
-          const response = await removeLabel(pr.number, label.name);
-          if (response.ok) {
-            console.info(
-              `Removed ${label.name} from "${pr.title}" (#${pr.number})`,
-            );
-          } else {
-            console.error(
-              `Failed to remove ${label.name} from "${pr.title}" (#${pr.number})`,
-            );
-            console.error(await response.text());
-          }
-        }),
-      )
-    ),
-  );
+  const promises = prs.flatMap((pr: {
+    title;
+    labels;
+    number: number;
+  }) => {
+    const backportLabels = pr.labels.filter((label: { name: string }) =>
+      label.name.startsWith("backport/")
+    );
+
+    return backportLabels.map(async (label: { name: string }) => {
+      const response = await removeLabel(pr.number, label.name);
+      if (response.ok) {
+        console.info(
+          `Removed ${label.name} from "${pr.title}" (#${pr.number})`,
+        );
+      } else {
+        console.error(
+          `Failed to remove ${label.name} from "${pr.title}" (#${pr.number})`,
+        );
+        console.error(await response.text());
+      }
+    });
+  });
+
+  return Promise.all(promises);
 };
