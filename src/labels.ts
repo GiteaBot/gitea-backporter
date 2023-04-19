@@ -53,7 +53,7 @@ export const removeBackportLabelsFromPrsTargetingReleaseBranches = async () => {
 
 // given a list of PRs, removes the backport/* labels from them
 export const removeBackportLabelsFromPrs = (prs) => {
-  const promises = prs.flatMap((pr: {
+  return Promise.all(prs.flatMap((pr: {
     title;
     labels;
     number: number;
@@ -75,7 +75,5 @@ export const removeBackportLabelsFromPrs = (prs) => {
         console.error(await response.text());
       }
     });
-  });
-
-  return Promise.all(promises);
+  }));
 };
