@@ -1,6 +1,13 @@
 import { fetchMergedWithLabel, fetchTargeting, removeLabel } from "./github.ts";
 import { fetchGiteaVersions } from "./giteaVersion.ts";
 
+// a relevant label is one that is used to control the merge queue,
+// manage backports or any other label that causes the bot to act on
+// detection, such as reviewed/* or backport/*
+export const isRelevantLabel = (label: string): boolean => {
+  return label.startsWith("reviewed/") || label.startsWith("backport/");
+};
+
 export const run = async () => {
   const labelsToRemoveAfterMerge = [
     "reviewed/wait-merge",

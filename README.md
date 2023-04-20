@@ -37,6 +37,7 @@ Set the following environment variables:
 
 ```
 BACKPORTER_GITHUB_TOKEN= # A GitHub personal access token with permissions to add labels to the go-gitea/gitea repo
+BACKPORTER_GITHUB_SECRET= # The secret that is used to sign the webhook payload (set in GitHub's webhook settings)
 BACKPORTER_GITEA_FORK= # The fork of go-gitea/gitea to push the backport branch to (e.g. yardenshoham/gitea)
 ```
 
@@ -46,8 +47,8 @@ Then run:
 deno run --allow-net --allow-env --allow-run src/webhook.ts
 ```
 
-This will spin up a web server on port 8000. You can then set up a webhook on
-`/trigger` to run the automatic backport.
+This will spin up a web server on port 8000. You can then set up a GitHub
+webhook on `/trigger` to run the this bot.
 
 ## Contributing
 
