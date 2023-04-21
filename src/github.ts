@@ -81,6 +81,22 @@ export const updatePr = async (prNumber: number): Promise<Response> => {
   return response;
 };
 
+// get the go-gitea/gitea main branch
+export const fetchMain = async () => {
+  const response = await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/branches/main`,
+    { headers: HEADERS },
+  );
+  return response.json();
+};
+
+// checks if the given PR needs to be updated
+export const needsUpdate = async (prNumber: number) => {
+  // get the PR and check if its base sha is the same as the current main sha
+  const [pr, main] = await Promise.all([fetchPr(prNumber), fetchMain()]);
+  return pr.base.sha !== main.commit.sha;
+};
+
 // given a PR number that has the given label, remove the label
 export const removeLabel = async (
   prNumber: number,
