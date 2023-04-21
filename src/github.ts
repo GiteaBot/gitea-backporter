@@ -118,6 +118,18 @@ export const fetchPr = async (prNumber: number) => {
   return response.json();
 };
 
+// sets the milestone of the given PR
+export const setMilestone = (prNumber: number, milestone: number) => {
+  return fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/issues/${prNumber}`,
+    {
+      method: "PATCH",
+      headers: HEADERS,
+      body: JSON.stringify({ milestone }),
+    },
+  );
+};
+
 // returns true if a backport PR exists for the given PR number and Gitea version
 export const backportPrExists = async (
   pr: { number: number },
@@ -229,18 +241,6 @@ export const createBackportPr = async (
       method: "POST",
       headers: HEADERS,
       body: JSON.stringify({ labels }),
-    },
-  );
-
-  // set milestone
-  await fetch(
-    `${GITHUB_API}/repos/go-gitea/gitea/issues/${json.number}`,
-    {
-      method: "PATCH",
-      headers: HEADERS,
-      body: JSON.stringify({
-        milestone: giteaVersion.milestoneNumber,
-      }),
     },
   );
 

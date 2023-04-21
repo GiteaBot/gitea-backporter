@@ -31,6 +31,11 @@ The script will also look for pull requests that have the label
 `reviewed/wait-merge` and are still open. It will merge the upstream changes
 into the pull request head branch.
 
+### Milestone maintenance
+
+When a pull request is created, the script will assign it a milestone based on
+its target branch.
+
 ## Usage
 
 Set the following environment variables:

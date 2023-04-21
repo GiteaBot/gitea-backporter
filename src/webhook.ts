@@ -4,6 +4,7 @@ import { verify } from "https://esm.sh/@octokit/webhooks-methods@3.0.2";
 import * as backport from "./backport.ts";
 import * as labels from "./labels.ts";
 import * as mergeQueue from "./mergeQueue.ts";
+import * as milestones from "./milestones.ts";
 
 const secret = Deno.env.get("BACKPORTER_GITHUB_SECRET");
 
@@ -43,6 +44,12 @@ webhook.on(
     }
   },
 );
+
+// on pull request creation, we'll automatically set the milestone
+// according to the target branch
+webhook.on("pull_request.opened", ({ payload }) => {
+  milestones.assign(payload.pull_request.number);
+});
 
 serve(async (req: Request) => {
   // the request URL contain the entire URL, we want to trigger only if the
