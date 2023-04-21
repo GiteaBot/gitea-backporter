@@ -5,7 +5,7 @@ export const run = async () => {
 
   // group PRs by milestone
   const milestoneToPr = new Map<string, number[]>();
-  for (const pr of pendingMerge) {
+  for (const pr of pendingMerge.items) {
     const milestone = pr.milestone?.title;
     const prs = milestoneToPr.get(milestone) ?? [];
     prs.push(pr.number);
