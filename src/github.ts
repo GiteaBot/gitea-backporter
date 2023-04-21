@@ -66,6 +66,21 @@ export const fetchTargeting = async (branch: string) => {
   return json;
 };
 
+// returns a list of closed PRs that have the given milestone
+export const fetchUnmergedClosedWithMilestone = async (
+  milestoneTitle: string,
+) => {
+  const response = await fetch(
+    `${GITHUB_API}/search/issues?q=` +
+      encodeURIComponent(
+        `is:pr is:closed is:unmerged milestone:${milestoneTitle} repo:go-gitea/gitea`,
+      ),
+    { headers: HEADERS },
+  );
+  const json = await response.json();
+  return json;
+};
+
 // update a given PR with the latest upstream changes by merging HEAD from
 // the base branch into the pull request branch
 export const updatePr = async (prNumber: number): Promise<Response> => {
@@ -128,6 +143,15 @@ export const setMilestone = (prNumber: number, milestone: number) => {
       body: JSON.stringify({ milestone }),
     },
   );
+};
+
+// removes the milestone of the given PR
+export const removeMilestone = (prNumber: number) => {
+  return fetch(`${GITHUB_API}/repos/go-gitea/gitea/issues/${prNumber}`, {
+    method: "PATCH",
+    headers: HEADERS,
+    body: JSON.stringify({ milestone: null }),
+  });
 };
 
 // returns true if a backport PR exists for the given PR number and Gitea version

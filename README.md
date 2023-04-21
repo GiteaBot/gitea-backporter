@@ -34,7 +34,8 @@ into the pull request head branch.
 ### Milestone maintenance
 
 When a pull request is created, the script will assign it a milestone based on
-its target branch.
+its target branch. The script makes sure that unmerged closed pull requests are
+not included in any milestone.
 
 ## Usage
 
