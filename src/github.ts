@@ -211,14 +211,15 @@ export const createBackportPr = async (
   });
   const json = await response.json();
 
-  // filter lgtm/*, backport/* and reviewed/* labels
+  // filter lgtm/*, backport/*, reviewed/*, and size/* labels
   const labels = originalPr.labels
     .map((label) => label.name)
     .filter((label) => {
       return (
         !label.startsWith("lgtm/") &&
         !label.startsWith("backport/") &&
-        !label.startsWith("reviewed/")
+        !label.startsWith("reviewed/") &&
+        !label.startsWith("size/")
       );
     });
 

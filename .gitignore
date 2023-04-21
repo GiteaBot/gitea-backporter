@@ -1,2 +1,5 @@
 .env
 gitea/
+
+# used for local testing
+/debug.ts
