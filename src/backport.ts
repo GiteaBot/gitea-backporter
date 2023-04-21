@@ -11,8 +11,8 @@ import {
 } from "./github.ts";
 
 if (
-  Deno.env.get("BACKPORTER_GITEA_FORK") === undefined ||
-  Deno.env.get("BACKPORTER_GITHUB_TOKEN") === undefined
+  !Deno.env.get("BACKPORTER_GITEA_FORK") ||
+  !Deno.env.get("BACKPORTER_GITHUB_TOKEN")
 ) {
   console.error(
     "BACKPORTER_GITEA_FORK and BACKPORTER_GITHUB_TOKEN must be set",
