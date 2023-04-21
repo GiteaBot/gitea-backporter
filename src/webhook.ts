@@ -8,9 +8,9 @@ import * as mergeQueue from "./mergeQueue.ts";
 const secret = Deno.env.get("BACKPORTER_GITHUB_SECRET");
 
 if (
-  Deno.env.get("BACKPORTER_GITEA_FORK") === undefined ||
-  Deno.env.get("BACKPORTER_GITHUB_TOKEN") === undefined ||
-  secret
+  !Deno.env.get("BACKPORTER_GITEA_FORK") ||
+  !Deno.env.get("BACKPORTER_GITHUB_TOKEN") ||
+  !secret
 ) {
   console.error(
     "BACKPORTER_GITEA_FORK, BACKPORTER_GITHUB_TOKEN and BACKPORTER_GITHUB_SECRET must be set",
