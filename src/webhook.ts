@@ -45,6 +45,10 @@ webhook.on(
 );
 
 serve(async (req: Request) => {
+  // the request URL contain the entire URL, we want to trigger only if the
+  // URL ends with /trigger. If it has anything else (including a query string)
+  // we won't trigger. The GitHub webhook is set such that requests from it end
+  // with /trigger.
   if (req.url.endsWith("/trigger") && req.method === "POST") {
     // verify signature
     const requestBody = await req.text();
