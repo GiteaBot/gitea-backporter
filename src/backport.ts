@@ -10,9 +10,19 @@ import {
   fetchPr,
 } from "./github.ts";
 
+if (
+  Deno.env.get("BACKPORTER_GITEA_FORK") === undefined ||
+  Deno.env.get("BACKPORTER_GITHUB_TOKEN") === undefined
+) {
+  console.error(
+    "BACKPORTER_GITEA_FORK and BACKPORTER_GITHUB_TOKEN must be set",
+  );
+}
+
+const user = await fetchCurrentUser();
+await initializeGitRepo(user.login, user.email);
+
 export const run = async () => {
-  const user = await fetchCurrentUser();
-  await initializeGitRepo(user.login, user.email);
   for (const giteaVersion of await fetchGiteaVersions()) {
     const candidates = await fetchCandidates(giteaVersion.majorMinorVersion);
     for (const candidate of candidates.items) {
