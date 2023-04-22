@@ -81,6 +81,72 @@ export const updatePr = async (prNumber: number): Promise<Response> => {
   return response;
 };
 
+// sets a commit status
+export const setCommitStatus = (
+  sha: string,
+  state: "error" | "failure" | "pending" | "success",
+  description: string,
+) => {
+  // TODO go-gitea/gitea
+  return fetch(
+    `${GITHUB_API}/repos/yardenshoham/test/statuses/${sha}`,
+    {
+      method: "POST",
+      headers: HEADERS,
+      body: JSON.stringify({
+        state,
+        context: "backporter/lgtm",
+        description,
+      }),
+    },
+  );
+};
+
+// returns the number of approvals a PR has
+export const getPrApprovalNumber = async (
+  prNumber: number,
+): Promise<number> => {
+  // load all reviews
+  const reviews: {
+    state:
+      | "APPROVED"
+      | "CHANGES_REQUESTED"
+      | "COMMENTED"
+      | "DISMISSED"
+      | "PENDING";
+    user: { login: string };
+  }[] = [];
+  let page = 1;
+  while (true) {
+    const response = await fetch(
+      `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/reviews?per_page=100&page=${page}`,
+      { headers: HEADERS },
+    );
+    if (!response.ok) throw new Error(await response.text());
+    const results: [] = await response.json();
+    if (results.length === 0) break;
+    reviews.push(...results);
+    page++;
+  }
+
+  // count approvers by replaying all reviews (they are already sorted)
+  const approvers = new Set();
+  for (const review of reviews) {
+    switch (review.state) {
+      case "APPROVED":
+        approvers.add(review.user.login);
+        break;
+      case "DISMISSED":
+      case "CHANGES_REQUESTED":
+        approvers.delete(review.user.login);
+        break;
+      default:
+        break;
+    }
+  }
+  return approvers.size;
+};
+
 // get the go-gitea/gitea main branch
 export const fetchMain = async () => {
   const response = await fetch(
