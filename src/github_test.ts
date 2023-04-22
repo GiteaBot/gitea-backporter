@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.184.0/testing/asserts.ts";
-import { fetchMain, getPrApprovers } from "./github.ts";
+import { fetchBranch, getPrApprovers } from "./github.ts";
 
 Deno.test("getPrApprovers() returns the appropriate approvers", async () => {
   const prToApprovers = {
@@ -14,12 +14,31 @@ Deno.test("getPrApprovers() returns the appropriate approvers", async () => {
   );
 });
 
-Deno.test("fetchMain() returns the appropriate main branch", async () => {
-  const mainBranch = await fetchMain();
+Deno.test('fetchBranch("main") returns the appropriate main branch', async () => {
+  const mainBranch = await fetchBranch("main");
   assertEquals(mainBranch.name, "main");
   assertEquals(mainBranch.protected, true);
   assertEquals(
     mainBranch._links.html,
     "https://github.com/go-gitea/gitea/tree/main",
+  );
+});
+
+Deno.test("fetchBranch() handles full ref name well", async () => {
+  const [mainBranch, releaseV119Branch] = await Promise.all([
+    fetchBranch("refs/heads/main"),
+    fetchBranch("refs/heads/release/v1.19"),
+  ]);
+  assertEquals(mainBranch.name, "main");
+  assertEquals(mainBranch.protected, true);
+  assertEquals(
+    mainBranch._links.html,
+    "https://github.com/go-gitea/gitea/tree/main",
+  );
+  assertEquals(releaseV119Branch.name, "release/v1.19");
+  assertEquals(releaseV119Branch.protected, true);
+  assertEquals(
+    releaseV119Branch._links.html,
+    "https://github.com/go-gitea/gitea/tree/release/v1.19",
   );
 });
