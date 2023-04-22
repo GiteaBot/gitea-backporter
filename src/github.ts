@@ -273,6 +273,7 @@ export const createBackportPr = async (
     .filter((label) => label.name.startsWith("backport/"));
   if (backportLabels.length === 1) {
     await addLabels(originalPr.number, ["backport/done"]);
+    console.log(`Added backport/done label to PR #${originalPr.number}`);
   }
 };
 
@@ -286,9 +287,6 @@ export const addLabels = async (prNumber: number, labels: string[]) => {
     },
   );
   await response.json();
-  console.log(
-    `Added backport/done label to PR #${prNumber}`,
-  );
 };
 
 export const addPrComment = async (prNumber: number, comment: string) => {
