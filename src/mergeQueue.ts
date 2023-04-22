@@ -1,4 +1,10 @@
-import { fetchPendingMerge, needsUpdate, updatePr } from "./github.ts";
+import {
+  addPrComment,
+  fetchPendingMerge,
+  needsUpdate,
+  removeLabel,
+  updatePr,
+} from "./github.ts";
 export const run = async () => {
   // fetch all PRs that are pending merge
   const pendingMerge = await fetchPendingMerge();
@@ -20,10 +26,20 @@ export const run = async () => {
       if (response.ok) {
         console.info(`Synced PR #${pr} in merge queue`);
         break;
-      } else {
-        console.error(`Failed to sync PR #${pr} in merge queue`);
-        console.error(await response.text());
       }
+
+      const body = await response.json();
+      if (body.message !== "merge conflict between base and head") {
+        console.error(`Failed to sync PR #${pr} in merge queue`);
+        console.error(JSON.stringify(body));
+      }
+
+      console.info(`Merge conflict detected in PR #${pr} in merge queue`);
+      // if there is a merge conflict, we'll add a comment to fix the conflicts and remove the reviewed/wait-merge label
+      await Promise.all([
+        addPrComment(pr, "Please fix the merge conflicts. :tea:"),
+        removeLabel(pr, "reviewed/wait-merge"),
+      ]);
     }
   }
 };
