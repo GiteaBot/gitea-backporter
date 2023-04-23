@@ -324,7 +324,5 @@ export const addPrComment = async (prNumber: number, comment: string) => {
     },
   );
   await response.json();
-  console.log(
-    `Added backport comment to PR #${prNumber}`,
-  );
+  console.info(`Added comment to PR #${prNumber}`);
 };
