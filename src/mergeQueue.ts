@@ -35,6 +35,7 @@ export const run = async () => {
       if (body.message !== "merge conflict between base and head") {
         console.error(`Failed to sync PR #${pr} in merge queue`);
         console.error(JSON.stringify(body));
+        break;
       }
 
       console.info(`Merge conflict detected in PR #${pr} in merge queue`);
