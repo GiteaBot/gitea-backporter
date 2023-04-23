@@ -5,7 +5,8 @@ import {
   removeLabel,
   updatePr,
 } from "./github.ts";
-export const run = async () => {
+import { debounce } from "https://deno.land/std@0.184.0/async/mod.ts";
+const updateBranch = async () => {
   // fetch all PRs that are pending merge
   const pendingMerge = await fetchPendingMerge();
 
@@ -52,3 +53,6 @@ export const run = async () => {
     }
   }
 };
+
+// make sure we don't trigger too often
+export const run = debounce(updateBranch, 15000);
