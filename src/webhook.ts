@@ -5,6 +5,7 @@ import * as backport from "./backport.ts";
 import * as labels from "./labels.ts";
 import * as mergeQueue from "./mergeQueue.ts";
 import * as milestones from "./milestones.ts";
+import * as lgtm from "./lgtm.ts";
 
 const secret = Deno.env.get("BACKPORTER_GITHUB_SECRET");
 
@@ -50,6 +51,15 @@ webhook.on(
 webhook.on("pull_request.opened", ({ payload }) => {
   milestones.assign(payload.pull_request.number);
 });
+
+// on pull request open, synchronization (push), and pull request review,
+// we'll update the lgtm status check and label
+webhook.on(
+  ["pull_request.opened", "pull_request.synchronize", "pull_request_review"],
+  ({ payload }) => {
+    lgtm.setPrStatusAndLabel(payload.pull_request);
+  },
+);
 
 // when PRs close, make sure no unmerged closed PRs have milestones
 webhook.on("pull_request.closed", () => {

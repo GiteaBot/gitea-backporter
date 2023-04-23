@@ -16,7 +16,7 @@ Deno.test("getPrApprovers() returns the appropriate approvers", async () => {
 
 Deno.test("getPrApprovalNumber() returns the appropriate approval number", async () => {
   const prToNumber = {
-    24270: 2,
+    24270: 3,
     24254: 2,
     24259: 2,
     24055: 0,

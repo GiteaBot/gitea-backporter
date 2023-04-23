@@ -38,6 +38,13 @@ When a pull request is created, the script will assign it a milestone based on
 its target branch. The script makes sure that unmerged closed pull requests are
 not included in any milestone.
 
+### LGTM
+
+The script will maintain each pull request's LGTM count. It will add the
+appropriate label (one of `lgtm/need 2`, `lgtm/need 1`, or `lgtm/done`) based on
+the number of approvals the pull request has. It will also set the commit status
+to `success` if the pull request has 2 or more approvals (`pending` if not).
+
 ## Usage
 
 Set the following environment variables:
