@@ -27,18 +27,20 @@ export const run = async () => {
       if (!await needsUpdate(pr.number)) break;
       const response = await updatePr(pr.number);
       if (response.ok) {
-        console.info(`Synced PR #${pr} in merge queue`);
+        console.info(`Synced PR #${pr.number} in merge queue`);
         break;
       }
 
       const body = await response.json();
       if (body.message !== "merge conflict between base and head") {
-        console.error(`Failed to sync PR #${pr} in merge queue`);
+        console.error(`Failed to sync PR #${pr.number} in merge queue`);
         console.error(JSON.stringify(body));
         break;
       }
 
-      console.info(`Merge conflict detected in PR #${pr} in merge queue`);
+      console.info(
+        `Merge conflict detected in PR #${pr.number} in merge queue`,
+      );
       // if there is a merge conflict, we'll add a comment to fix the conflicts and remove the reviewed/wait-merge label
       await Promise.all([
         addPrComment(
