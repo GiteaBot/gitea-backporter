@@ -29,12 +29,14 @@ any `backport/*` labels from them.
 
 The script will also look for pull requests that have the label
 `reviewed/wait-merge` and are still open. It will merge the upstream changes
-into the pull request head branch.
+into the pull request head branch. If a merge conflict occurs, it will remove
+the pull request from the merge queue.
 
 ### Milestone maintenance
 
 When a pull request is created, the script will assign it a milestone based on
-its target branch.
+its target branch. The script makes sure that unmerged closed pull requests are
+not included in any milestone.
 
 ## Usage
 

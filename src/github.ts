@@ -66,6 +66,21 @@ export const fetchTargeting = async (branch: string) => {
   return json;
 };
 
+// returns a list of closed PRs that have the given milestone
+export const fetchUnmergedClosedWithMilestone = async (
+  milestoneTitle: string,
+) => {
+  const response = await fetch(
+    `${GITHUB_API}/search/issues?q=` +
+      encodeURIComponent(
+        `is:pr is:closed is:unmerged milestone:${milestoneTitle} repo:go-gitea/gitea`,
+      ),
+    { headers: HEADERS },
+  );
+  const json = await response.json();
+  return json;
+};
+
 // update a given PR with the latest upstream changes by merging HEAD from
 // the base branch into the pull request branch
 export const updatePr = async (prNumber: number): Promise<Response> => {
@@ -147,10 +162,10 @@ export const getPrApprovalNumber = async (
   return approvers.size;
 };
 
-// get the go-gitea/gitea main branch
-export const fetchMain = async () => {
+// get a go-gitea/gitea branch
+export const fetchBranch = async (branch: string) => {
   const response = await fetch(
-    `${GITHUB_API}/repos/go-gitea/gitea/branches/main`,
+    `${GITHUB_API}/repos/go-gitea/gitea/branches/${branch}`,
     { headers: HEADERS },
   );
   return response.json();
@@ -158,9 +173,10 @@ export const fetchMain = async () => {
 
 // checks if the given PR needs to be updated
 export const needsUpdate = async (prNumber: number) => {
-  // get the PR and check if its base sha is the same as the current main sha
-  const [pr, main] = await Promise.all([fetchPr(prNumber), fetchMain()]);
-  return pr.base.sha !== main.commit.sha;
+  // get the PR and check if its base sha is the same as its base branch
+  const pr = await fetchPr(prNumber);
+  const base = await fetchBranch(pr.base.ref);
+  return pr.base.sha !== base.commit.sha;
 };
 
 // given a PR number that has the given label, remove the label
@@ -194,6 +210,15 @@ export const setMilestone = (prNumber: number, milestone: number) => {
       body: JSON.stringify({ milestone }),
     },
   );
+};
+
+// removes the milestone of the given PR
+export const removeMilestone = (prNumber: number) => {
+  return fetch(`${GITHUB_API}/repos/go-gitea/gitea/issues/${prNumber}`, {
+    method: "PATCH",
+    headers: HEADERS,
+    body: JSON.stringify({ milestone: null }),
+  });
 };
 
 // returns true if a backport PR exists for the given PR number and Gitea version
@@ -339,6 +364,7 @@ export const createBackportPr = async (
     .filter((label) => label.name.startsWith("backport/"));
   if (backportLabels.length === 1) {
     await addLabels(originalPr.number, ["backport/done"]);
+    console.log(`Added backport/done label to PR #${originalPr.number}`);
   }
 };
 
@@ -352,9 +378,6 @@ export const addLabels = async (prNumber: number, labels: string[]) => {
     },
   );
   await response.json();
-  console.log(
-    `Added backport/done label to PR #${prNumber}`,
-  );
 };
 
 export const addPrComment = async (prNumber: number, comment: string) => {
@@ -367,7 +390,5 @@ export const addPrComment = async (prNumber: number, comment: string) => {
     },
   );
   await response.json();
-  console.log(
-    `Added backport comment to PR #${prNumber}`,
-  );
+  console.info(`Added comment to PR #${prNumber}`);
 };

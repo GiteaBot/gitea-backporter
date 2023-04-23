@@ -47,3 +47,30 @@ export const assign = async (prNumber: number) => {
     `Set milestone ${giteaVersion.majorMinorVersion} for PR #${prNumber}`,
   );
 };
+
+export const run = async () => {
+  await removeMilestonesFromUnmergedClosedPrs();
+};
+
+// removes milestones from all PRs that are closed and unmerged
+const removeMilestonesFromUnmergedClosedPrs = async () => {
+  // get the current open milestones
+  const milestones = await github.getMilestones();
+
+  // for each milestone, fetch the PRs that are closed and included in the milestone
+  // and remove the milestone each PR
+  return Promise.all(milestones.flatMap(async (m) => {
+    const prs = await github.fetchUnmergedClosedWithMilestone(m.title);
+    return prs.items.map(async (pr) => {
+      const response = await github.removeMilestone(pr.number);
+      if (!response.ok) {
+        console.error(
+          `Failed to remove milestone from closed PR #${pr.number}`,
+        );
+        console.error(await response.text());
+        return;
+      }
+      console.log(`Removed milestone from closed PR #${pr.number}`);
+    });
+  }));
+};

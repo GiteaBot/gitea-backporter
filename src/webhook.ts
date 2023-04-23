@@ -51,6 +51,11 @@ webhook.on("pull_request.opened", ({ payload }) => {
   milestones.assign(payload.pull_request.number);
 });
 
+// when PRs close, make sure no unmerged closed PRs have milestones
+webhook.on("pull_request.closed", () => {
+  milestones.run();
+});
+
 serve(async (req: Request) => {
   // the request URL contain the entire URL, we want to trigger only if the
   // URL ends with /trigger. If it has anything else (including a query string)
