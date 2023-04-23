@@ -102,9 +102,8 @@ export const setCommitStatus = (
   state: "error" | "failure" | "pending" | "success",
   description: string,
 ) => {
-  // TODO go-gitea/gitea
   return fetch(
-    `${GITHUB_API}/repos/yardenshoham/test/statuses/${sha}`,
+    `${GITHUB_API}/repos/go-gitea/gitea/statuses/${sha}`,
     {
       method: "POST",
       headers: HEADERS,
