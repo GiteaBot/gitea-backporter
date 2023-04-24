@@ -1,29 +1,19 @@
 import { assertEquals } from "https://deno.land/std@0.184.0/testing/asserts.ts";
-import { fetchBranch, getPrApprovalNumber, getPrApprovers } from "./github.ts";
+import { fetchBranch, getPrApprovers } from "./github.ts";
 
 Deno.test("getPrApprovers() returns the appropriate approvers", async () => {
   const prToApprovers = {
-    23993: ["delvh", "jolheiser"],
-    24051: ["delvh", "silverwind"],
-    24047: ["yardenshoham", "lunny"],
+    23993: new Set(["delvh", "jolheiser"]),
+    24051: new Set(["delvh", "silverwind"]),
+    24047: new Set(["yardenshoham", "lunny"]),
+    24055: new Set<string>(),
+    24254: new Set(["jolheiser", "yardenshoham"]),
+    24259: new Set(["jolheiser", "delvh"]),
+    24270: new Set(["lunny", "delvh", "silverwind"]),
   };
   await Promise.all(
     Object.entries(prToApprovers).map(async ([pr, approvers]) => {
       assertEquals(await getPrApprovers(Number(pr)), approvers);
-    }),
-  );
-});
-
-Deno.test("getPrApprovalNumber() returns the appropriate approval number", async () => {
-  const prToNumber = {
-    24270: 3,
-    24254: 2,
-    24259: 2,
-    24055: 0,
-  };
-  await Promise.all(
-    Object.entries(prToNumber).map(async ([pr, number]) => {
-      assertEquals(await getPrApprovalNumber(Number(pr)), number);
     }),
   );
 });

@@ -116,51 +116,6 @@ export const setCommitStatus = (
   );
 };
 
-// returns the number of approvals a PR has
-export const getPrApprovalNumber = async (
-  prNumber: number,
-): Promise<number> => {
-  // load all reviews
-  const reviews: {
-    state:
-      | "APPROVED"
-      | "CHANGES_REQUESTED"
-      | "COMMENTED"
-      | "DISMISSED"
-      | "PENDING";
-    user: { login: string };
-  }[] = [];
-  let page = 1;
-  while (true) {
-    const response = await fetch(
-      `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/reviews?per_page=100&page=${page}`,
-      { headers: HEADERS },
-    );
-    if (!response.ok) throw new Error(await response.text());
-    const results: [] = await response.json();
-    if (results.length === 0) break;
-    reviews.push(...results);
-    page++;
-  }
-
-  // count approvers by replaying all reviews (they are already sorted)
-  const approvers = new Set();
-  for (const review of reviews) {
-    switch (review.state) {
-      case "APPROVED":
-        approvers.add(review.user.login);
-        break;
-      case "DISMISSED":
-      case "CHANGES_REQUESTED":
-        approvers.delete(review.user.login);
-        break;
-      default:
-        break;
-    }
-  }
-  return approvers.size;
-};
-
 // get a go-gitea/gitea branch
 export const fetchBranch = async (branch: string) => {
   const response = await fetch(
@@ -266,18 +221,46 @@ export const getMilestones = async (): Promise<Milestone[]> => {
 };
 
 export const getPrApprovers = async (prNumber: number) => {
-  const response = await fetch(
-    `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/reviews`,
-    { headers: HEADERS },
-  );
-  const json = await response.json();
+  // load all reviews
+  const reviews: {
+    state:
+      | "APPROVED"
+      | "CHANGES_REQUESTED"
+      | "COMMENTED"
+      | "DISMISSED"
+      | "PENDING";
+    user: { login: string };
+  }[] = [];
+  let page = 1;
+  while (true) {
+    const response = await fetch(
+      `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/reviews?per_page=100&page=${page}`,
+      { headers: HEADERS },
+    );
+    if (!response.ok) throw new Error(await response.text());
+    const results: [] = await response.json();
+    if (results.length === 0) break;
+    reviews.push(...results);
+    page++;
+  }
 
-  const approvers = json
-    .filter((review: { state: string }) => review.state === "APPROVED")
-    .map((r: { user: { login: string } }) => r.user.login);
+  // count approvers by replaying all reviews (they are already sorted)
+  const approvers = new Set<string>();
+  for (const review of reviews) {
+    switch (review.state) {
+      case "APPROVED":
+        approvers.add(review.user.login);
+        break;
+      case "DISMISSED":
+      case "CHANGES_REQUESTED":
+        approvers.delete(review.user.login);
+        break;
+      default:
+        break;
+    }
+  }
 
-  // return unique approvers
-  return [...new Set(approvers)];
+  return approvers;
 };
 
 export const createBackportPr = async (

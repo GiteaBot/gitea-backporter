@@ -1,6 +1,6 @@
 import {
   addLabels,
-  getPrApprovalNumber,
+  getPrApprovers,
   removeLabel,
   setCommitStatus,
 } from "./github.ts";
@@ -14,15 +14,15 @@ export const setPrStatusAndLabel = async (
     number: number;
   },
 ) => {
-  let approvals;
+  let approvers;
   try {
-    approvals = await getPrApprovalNumber(pr.number);
+    approvers = await getPrApprovers(pr.number);
   } catch (error) {
     console.error(error);
     return;
   }
 
-  const { state, message, desiredLabel } = getPrStatusAndLabel(approvals);
+  const { state, message, desiredLabel } = getPrStatusAndLabel(approvers.size);
   const currentLgtmLabels = pr.labels.filter((l) => l.name.startsWith("lgtm/"));
 
   // remove any undesired lgtm labels
