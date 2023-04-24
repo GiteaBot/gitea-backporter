@@ -337,7 +337,7 @@ export const createBackportPr = async (
     {
       method: "POST",
       headers: HEADERS,
-      body: JSON.stringify({ reviewers: approvers }),
+      body: JSON.stringify({ reviewers: [...approvers] }),
     },
   );
 
