@@ -6,16 +6,18 @@ import * as labels from "./labels.ts";
 import * as mergeQueue from "./mergeQueue.ts";
 import * as milestones from "./milestones.ts";
 import * as lgtm from "./lgtm.ts";
+import * as builds from "./builds.ts";
 
 const secret = Deno.env.get("BACKPORTER_GITHUB_SECRET");
 
 if (
   !Deno.env.get("BACKPORTER_GITEA_FORK") ||
   !Deno.env.get("BACKPORTER_GITHUB_TOKEN") ||
+  !Deno.env.get("BACKPORTER_DRONE_TOKEN") ||
   !secret
 ) {
   console.error(
-    "BACKPORTER_GITEA_FORK, BACKPORTER_GITHUB_TOKEN and BACKPORTER_GITHUB_SECRET must be set",
+    "BACKPORTER_GITEA_FORK, BACKPORTER_GITHUB_TOKEN, BACKPORTER_GITHUB_SECRET, and BACKPORTER_DRONE_TOKEN must be set",
   );
 }
 
@@ -60,6 +62,12 @@ webhook.on(
     lgtm.setPrStatusAndLabel(payload.pull_request);
   },
 );
+
+// when a new commit is pushed to a PR, we'll stop any old builds as they are
+// only putting load on the CI system without providing any value
+webhook.on("pull_request.synchronize", ({ payload }) => {
+  builds.stopOldBuilds(payload.pull_request);
+});
 
 // when PRs close, make sure no unmerged closed PRs have milestones
 webhook.on("pull_request.closed", () => {

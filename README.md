@@ -45,6 +45,11 @@ appropriate label (one of `lgtm/need 2`, `lgtm/need 1`, or `lgtm/done`) based on
 the number of approvals the pull request has. It will also set the commit status
 to `success` if the pull request has 2 or more approvals (`pending` if not).
 
+### Build maintenance
+
+The script will make sure no irrelevant builds are running. It will cancel any
+builds that have had new commits pushed to their branch.
+
 ## Usage
 
 Set the following environment variables:
@@ -53,6 +58,7 @@ Set the following environment variables:
 BACKPORTER_GITHUB_TOKEN= # A GitHub personal access token with permissions to add labels to the go-gitea/gitea repo
 BACKPORTER_GITHUB_SECRET= # The secret that is used to sign the webhook payload (set in GitHub's webhook settings)
 BACKPORTER_GITEA_FORK= # The fork of go-gitea/gitea to push the backport branch to (e.g. yardenshoham/gitea)
+BACKPORTER_DRONE_TOKEN= # A token for the Drone CI instance https://drone.gitea.io
 ```
 
 Then run:
