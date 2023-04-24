@@ -75,7 +75,7 @@ export const getPrStatusAndLabel = (approvals: number) => {
   }
   if (approvals >= 2) {
     desiredLabel = "lgtm/done";
-    message = "Approved";
+    message = `Approved by ${approvals} people`;
     state = "success";
   }
 
