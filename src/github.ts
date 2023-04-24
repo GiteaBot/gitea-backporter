@@ -109,7 +109,7 @@ export const setCommitStatus = (
       headers: HEADERS,
       body: JSON.stringify({
         state,
-        context: "backporter/lgtm",
+        context: "giteabot/lgtm",
         description,
       }),
     },
