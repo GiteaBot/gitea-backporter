@@ -17,6 +17,6 @@ export const stopOldBuilds = async (
       build.status === "running" &&
       build.ref === `refs/pull/${pr.number}/head` &&
       build.after !== pr.head.sha
-    ).map((build) => drone.deleteBuild(build.number)),
+    ).map((build) => drone.stopBuild(build.number)),
   );
 };

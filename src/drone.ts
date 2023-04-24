@@ -3,7 +3,7 @@ const HEADERS = {
   Authorization: `Bearer ${Deno.env.get("BACKPORTER_DRONE_TOKEN")}`,
 };
 
-export const deleteBuild = async (buildNumber: number): Promise<void> => {
+export const stopBuild = async (buildNumber: number): Promise<void> => {
   const response = await fetch(`${DRONE_API}/builds/${buildNumber}`, {
     method: "DELETE",
     headers: HEADERS,
@@ -11,7 +11,7 @@ export const deleteBuild = async (buildNumber: number): Promise<void> => {
 
   if (!response.ok) {
     throw new Error(
-      `Failed to delete build ${buildNumber}: ${response.statusText}`,
+      `Failed to stop build ${buildNumber}: ${response.statusText}`,
     );
   }
 };
