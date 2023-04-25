@@ -26,5 +26,9 @@ jobs:
       - name: Run linter
         run: deno lint
 
-      # - name: Run tests
-      #  run: deno test -A
+      - name: Run tests
+        run: deno test -A
+        env:
+          BACKPORTER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BACKPORTER_GITEA_FORK: GiteaBot/gitea
+          BACKPORTER_GITHUB_SECRET: dummy
