@@ -1,3 +1,4 @@
+import * as SemVer from "https://deno.land/std@0.184.0/semver/mod.ts";
 import { fetchGiteaVersions } from "./giteaVersion.ts";
 import * as github from "./github.ts";
 
@@ -7,14 +8,25 @@ export const assign = async (pr: { number: number; base: { ref: string } }) => {
   const giteaVersions = await fetchGiteaVersions();
 
   // find the gitea version that matches the PR's base branch
-  const giteaVersion = giteaVersions.find((version) =>
+  let giteaVersion = giteaVersions.find((version) =>
     pr.base.ref === `release/v${version.majorMinorVersion}`
   );
 
   // if no gitea version is found, the PR is targeting the main branch. We
-  // don't set a milestone automatically for PRs targeting the main branch.
+  // will use the gitea version with the highest major and minor version using
+  // Deno's semver library (gt function)
   if (!giteaVersion) {
-    return;
+    giteaVersion = giteaVersions.reduce((highest, version) => {
+      if (
+        SemVer.gt(
+          `${version.majorMinorVersion}.0`,
+          `${highest.majorMinorVersion}.0`,
+        )
+      ) {
+        return version;
+      }
+      return highest;
+    }, giteaVersions[0]);
   }
 
   const response = await github.setMilestone(
