@@ -13,18 +13,18 @@ const updateBranch = async () => {
 
   // update all PRs pending merge (only if they need an update)
   for (const pr of pendingMerge.items) {
-    if (!await needsUpdate(pr.number)) break;
+    if (!await needsUpdate(pr.number)) continue;
     const response = await updatePr(pr.number);
     if (response.ok) {
       console.info(`Synced PR #${pr.number} in merge queue`);
-      break;
+      continue;
     }
 
     const body = await response.json();
     if (body.message !== "merge conflict between base and head") {
       console.error(`Failed to sync PR #${pr.number} in merge queue`);
       console.error(JSON.stringify(body));
-      break;
+      continue;
     }
 
     console.info(
