@@ -1,7 +1,7 @@
 import { assertEquals } from "https://deno.land/std@0.184.0/testing/asserts.ts";
-import { fetchBranch, getPrApprovers } from "./github.ts";
+import { fetchBranch, getPrReviewers } from "./github.ts";
 
-Deno.test("getPrApprovers() returns the appropriate approvers", async () => {
+Deno.test("getPrReviewers() returns the appropriate approvers", async () => {
   const prToApprovers = {
     23993: new Set(["delvh", "jolheiser"]),
     24051: new Set(["delvh", "silverwind"]),
@@ -13,7 +13,7 @@ Deno.test("getPrApprovers() returns the appropriate approvers", async () => {
   };
   await Promise.all(
     Object.entries(prToApprovers).map(async ([pr, approvers]) => {
-      assertEquals(await getPrApprovers(Number(pr)), approvers);
+      assertEquals((await getPrReviewers(Number(pr))).approvers, approvers);
     }),
   );
 });

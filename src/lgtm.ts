@@ -1,6 +1,6 @@
 import {
   addLabels,
-  getPrApprovers,
+  getPrReviewers,
   removeLabel,
   setCommitStatus,
 } from "./github.ts";
@@ -14,15 +14,15 @@ export const setPrStatusAndLabel = async (
     number: number;
   },
 ) => {
-  let approvers;
+  let reviewers;
   try {
-    approvers = await getPrApprovers(pr.number);
+    reviewers = await getPrReviewers(pr.number);
   } catch (error) {
     console.error(error);
     return;
   }
 
-  const { state, message, desiredLabel } = getPrStatusAndLabel(approvers.size);
+  const { state, message, desiredLabel } = getPrStatusAndLabel(reviewers);
   const currentLgtmLabels = pr.labels.filter((l) => l.name.startsWith("lgtm/"));
 
   // remove any undesired lgtm labels
@@ -64,18 +64,28 @@ export const setPrStatusAndLabel = async (
 };
 
 // returns the status, message, and label for a given number of approvals
-export const getPrStatusAndLabel = (approvals: number) => {
+export const getPrStatusAndLabel = (
+  reviewers: { approvers: Set<string>; blockers: Set<string> },
+) => {
   let desiredLabel = "lgtm/need 2";
   let message = "Needs two more approvals";
   let state: "pending" | "success" = "pending";
 
-  if (approvals === 1) {
+  if (reviewers.blockers.size > 0) {
+    desiredLabel = "lgtm/blocked";
+    message = "Blocked by " + Array.from(reviewers.blockers).join(", ");
+    state = "pending";
+    return { state, message, desiredLabel };
+  }
+
+  if (reviewers.approvers.size === 1) {
     desiredLabel = "lgtm/need 1";
     message = "Needs one more approval";
   }
-  if (approvals >= 2) {
+
+  if (reviewers.approvers.size >= 2) {
     desiredLabel = "lgtm/done";
-    message = `Approved by ${approvals} people`;
+    message = `Approved by ${reviewers.approvers.size} people`;
     state = "success";
   }
 

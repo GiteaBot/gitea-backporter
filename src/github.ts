@@ -220,7 +220,9 @@ export const getMilestones = async (): Promise<Milestone[]> => {
   return Object.values(earliestPatchVersions);
 };
 
-export const getPrApprovers = async (prNumber: number) => {
+export const getPrReviewers = async (
+  prNumber: number,
+): Promise<{ approvers: Set<string>; blockers: Set<string> }> => {
   // load all reviews
   const reviews: {
     state:
@@ -244,23 +246,29 @@ export const getPrApprovers = async (prNumber: number) => {
     page++;
   }
 
-  // count approvers by replaying all reviews (they are already sorted)
+  // count approvers and blockers by replaying all reviews (they are already sorted)
   const approvers = new Set<string>();
+  const blockers = new Set<string>();
   for (const review of reviews) {
     switch (review.state) {
       case "APPROVED":
         approvers.add(review.user.login);
+        blockers.delete(review.user.login);
         break;
       case "DISMISSED":
+        approvers.delete(review.user.login);
+        blockers.delete(review.user.login);
+        break;
       case "CHANGES_REQUESTED":
         approvers.delete(review.user.login);
+        blockers.add(review.user.login);
         break;
       default:
         break;
     }
   }
 
-  return approvers;
+  return { approvers, blockers };
 };
 
 export const createBackportPr = async (
@@ -331,7 +339,7 @@ export const createBackportPr = async (
   );
 
   // request review from original PR approvers
-  const approvers = await getPrApprovers(originalPr.number);
+  const { approvers } = await getPrReviewers(originalPr.number);
   await fetch(
     `${GITHUB_API}/repos/go-gitea/gitea/pulls/${json.number}/requested_reviewers`,
     {
