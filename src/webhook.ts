@@ -49,7 +49,7 @@ webhook.on(
 // on pull request creation, we'll automatically set the milestone
 // according to the target branch
 webhook.on("pull_request.opened", ({ payload }) => {
-  milestones.assign(payload.pull_request.number);
+  milestones.assign(payload.pull_request);
 });
 
 // on pull request open, synchronization (push), and pull request review,
