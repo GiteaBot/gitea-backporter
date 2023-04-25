@@ -42,4 +42,4 @@ const updateBranch = async () => {
 };
 
 // make sure we don't trigger too often
-export const run = debounce(updateBranch, 15000);
+export const run = debounce(updateBranch, 8000);
