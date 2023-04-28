@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.184.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.185.0/testing/asserts.ts";
 import { fetchBranch, getPrApprovers } from "./github.ts";
 
 Deno.test("getPrApprovers() returns the appropriate approvers", async () => {
