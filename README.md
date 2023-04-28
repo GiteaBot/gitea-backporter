@@ -45,7 +45,8 @@ The script will maintain each pull request's LGTM count. It will add the
 appropriate label (one of `lgtm/need 2`, `lgtm/need 1`, `lgtm/done`, or
 `lgtm/blocked`) based on the number of approvals (or change requests) the pull
 request has. It will also set the commit status to `success` if the pull request
-has 2 or more approvals without changes requested (`pending` if not).
+has 2 or more approvals without changes requested (`pending` if not or `failure`
+if changes are requested).
 
 ## Usage
 
