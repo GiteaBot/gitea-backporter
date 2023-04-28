@@ -69,12 +69,12 @@ export const getPrStatusAndLabel = (
 ) => {
   let desiredLabel = "lgtm/need 2";
   let message = "Needs two more approvals";
-  let state: "pending" | "success" = "pending";
+  let state: "pending" | "success" | "failure" = "pending";
 
   if (reviewers.blockers.size > 0) {
     desiredLabel = "lgtm/blocked";
     message = "Blocked by " + Array.from(reviewers.blockers).join(", ");
-    state = "pending";
+    state = "failure";
     return { state, message, desiredLabel };
   }
 
