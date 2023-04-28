@@ -1,5 +1,5 @@
-FROM denoland/deno:alpine
-RUN apk add --no-cache git
+FROM denoland/deno
+RUN apt-get update && apt-get install -y git
 EXPOSE 8000
 USER deno
 WORKDIR /app

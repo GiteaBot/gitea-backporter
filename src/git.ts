@@ -1,43 +1,44 @@
+import * as cmd from "./cmd.ts";
+
 export const getPrBranchName = (
   prNumber: number,
   giteaMajorMinorVersion: string,
 ) => `backport-${prNumber}-v${giteaMajorMinorVersion}`;
 
 export const initializeGitRepo = async (user: string, email: string | null) => {
-  await Deno.run({
-    cmd: [
-      "git",
+  await cmd.run("git", {
+    args: [
       "clone",
       `https://${Deno.env.get("BACKPORTER_GITHUB_TOKEN")}@github.com/${
         Deno.env.get("BACKPORTER_GITEA_FORK")
       }.git`,
+      "gitea",
     ],
-  }).status();
-  await Deno.run({
+  });
+  await cmd.run("git", {
     cwd: "gitea",
-    cmd: [
-      "git",
+    args: [
       "remote",
       "add",
       "upstream",
       "https://github.com/go-gitea/gitea.git",
     ],
-  }).status();
+  });
 
   // set the user name and email
-  await Deno.run({
+  await cmd.run("git", {
     cwd: "gitea",
-    cmd: ["git", "config", "user.name", user],
-  }).status();
+    args: ["config", "user.name", user],
+  });
   // the email might be null if the token doesn't have the user scope,
   // see https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#get-the-authenticated-user
   if (!email) {
     email = "teabot@gitea.io";
   }
-  await Deno.run({
+  await cmd.run("git", {
     cwd: "gitea",
-    cmd: ["git", "config", "user.email", email],
-  }).status();
+    args: ["config", "user.email", email],
+  });
 };
 
 export const cherryPickPr = async (
@@ -46,55 +47,46 @@ export const cherryPickPr = async (
   giteaMajorMinorVersion: string,
 ): Promise<boolean> => {
   // fetch the upstream main branch
-  await Deno.run({
+  await cmd.run("git", {
     cwd: "gitea",
-    cmd: ["git", "fetch", "upstream", "main"],
-  }).status();
+    args: ["fetch", "upstream", "main"],
+  });
 
   // fetch the upstream release branch
-  await Deno.run({
+  await cmd.run("git", {
     cwd: "gitea",
-    cmd: ["git", "fetch", "upstream", `release/v${giteaMajorMinorVersion}`],
-  }).status();
+    args: ["fetch", "upstream", `release/v${giteaMajorMinorVersion}`],
+  });
 
   // create the backport branch from the upstream release branch
-  await Deno.run({
+  await cmd.run("git", {
     cwd: "gitea",
-    cmd: [
-      "git",
+    args: [
       "checkout",
       `upstream/release/v${giteaMajorMinorVersion}`,
       "-b",
       getPrBranchName(prNumber, giteaMajorMinorVersion),
     ],
-  }).status();
-
-  console.log(`Cherry-picking ${commitHash}`);
+  });
 
   // cherry-pick the PR
-  const cherryPickStatus = await Deno.run({
+  const cherryPickStatus = await cmd.run("git", {
     cwd: "gitea",
-    cmd: ["git", "cherry-pick", commitHash],
-  }).status();
+    args: ["cherry-pick", commitHash],
+  });
 
   if (!cherryPickStatus.success) {
-    console.log("Cherry-pick failed");
-    await Deno.run({
+    await cmd.run("git", {
       cwd: "gitea",
-      cmd: ["git", "cherry-pick", "--abort"],
-    }).status();
+      args: ["cherry-pick", "--abort"],
+    });
     return false;
   }
 
   // push the branch to the fork
-  await Deno.run({
+  await cmd.run("git", {
     cwd: "gitea",
-    cmd: [
-      "git",
-      "push",
-      "origin",
-      getPrBranchName(prNumber, giteaMajorMinorVersion),
-    ],
-  }).status();
+    args: ["push", "origin", getPrBranchName(prNumber, giteaMajorMinorVersion)],
+  });
   return true;
 };

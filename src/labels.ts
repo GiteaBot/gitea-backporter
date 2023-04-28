@@ -1,5 +1,6 @@
 import { fetchMergedWithLabel, fetchTargeting, removeLabel } from "./github.ts";
 import { fetchGiteaVersions } from "./giteaVersion.ts";
+import { debounce } from "https://deno.land/std@0.185.0/async/mod.ts";
 
 // a relevant label is one that is used to control the merge queue,
 // manage backports or any other label that causes the bot to act on
@@ -8,7 +9,7 @@ export const isRelevantLabel = (label: string): boolean => {
   return label.startsWith("reviewed/") || label.startsWith("backport/");
 };
 
-export const run = async () => {
+const maintain = async () => {
   const labelsToRemoveAfterMerge = [
     "reviewed/wait-merge",
     "reviewed/prioritize-merge",
@@ -84,3 +85,6 @@ export const removeBackportLabelsFromPrs = (prs) => {
     });
   }));
 };
+
+// make sure we don't trigger too often
+export const run = debounce(maintain, 8000);

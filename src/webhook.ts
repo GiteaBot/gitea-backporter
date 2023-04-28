@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.184.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.185.0/http/server.ts";
 import { createEventHandler } from "https://esm.sh/@octokit/webhooks@11.0.0";
 import { verify } from "https://esm.sh/@octokit/webhooks-methods@3.0.2";
 import * as backport from "./backport.ts";
@@ -47,9 +47,18 @@ webhook.on(
 );
 
 // on pull request creation, we'll automatically set the milestone
-// according to the target branch
+// according to the target branch (if it's a release branch)
 webhook.on("pull_request.opened", ({ payload }) => {
-  milestones.assign(payload.pull_request.number);
+  if (payload.pull_request.base.ref.startsWith("release/")) {
+    milestones.assign(payload.pull_request);
+  }
+});
+
+// on pull request merge, make sure the PR has a milestone
+webhook.on("pull_request.closed", ({ payload }) => {
+  if (payload.pull_request.merged && !payload.pull_request.milestone) {
+    milestones.assign(payload.pull_request);
+  }
 });
 
 // on pull request open, synchronization (push), and pull request review,

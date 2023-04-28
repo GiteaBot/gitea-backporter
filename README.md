@@ -35,8 +35,9 @@ the pull request from the merge queue.
 ### Milestone maintenance
 
 When a pull request is created, the script will assign it a milestone based on
-its target branch. The script makes sure that unmerged closed pull requests are
-not included in any milestone.
+its target branch (except pull requests targeting `main`, we'll assign those on
+merge). The script makes sure that unmerged closed pull requests are not
+included in any milestone.
 
 ### LGTM
 
