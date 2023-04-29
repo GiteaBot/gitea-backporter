@@ -12,11 +12,12 @@ export const setPrStatusAndLabel = async (
     head: { sha: string };
     title: string;
     number: number;
+    requested_reviewers: { login: string }[];
   },
 ) => {
   let reviewers;
   try {
-    reviewers = await getPrReviewers(pr.number);
+    reviewers = await getPrReviewers(pr);
   } catch (error) {
     console.error(error);
     return;

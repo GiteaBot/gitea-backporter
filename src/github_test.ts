@@ -1,20 +1,59 @@
 import { assertEquals } from "https://deno.land/std@0.185.0/testing/asserts.ts";
-import { fetchBranch, getPrReviewers } from "./github.ts";
+import { fetchBranch, fetchPr, getPrReviewers } from "./github.ts";
 
 Deno.test("getPrReviewers() returns the appropriate approvers", async () => {
-  const prToApprovers = {
-    23993: new Set(["delvh", "jolheiser"]),
-    24051: new Set(["delvh", "silverwind"]),
-    24047: new Set(["yardenshoham", "lunny"]),
-    24055: new Set<string>(),
-    24254: new Set(["jolheiser", "yardenshoham"]),
-    24259: new Set(["jolheiser", "delvh"]),
-    24270: new Set(["lunny", "delvh", "silverwind"]),
+  const prToApproversAndBlockers = {
+    8346: { // note lafriks and guillep2k are requested reviewers so they don't count as approvers nor blockers
+      approvers: new Set([
+        "silverwind",
+        "6543",
+        "lunny",
+        "techknowlogick",
+        "zeripath",
+        "sapk",
+        "BaxAndrei",
+      ]),
+      blockers: new Set(["SuperSandro2000"]),
+    },
+    23993: {
+      approvers: new Set(["delvh", "jolheiser"]),
+      blockers: new Set<string>(),
+    },
+    24051: {
+      approvers: new Set(["delvh", "silverwind"]),
+      blockers: new Set<string>(),
+    },
+    24047: {
+      approvers: new Set(["yardenshoham", "lunny"]),
+      blockers: new Set<string>(),
+    },
+    24055: { approvers: new Set<string>(), blockers: new Set<string>() },
+    24147: { // delvh approved and then self-requested review
+      approvers: new Set<string>(),
+      blockers: new Set<string>(),
+    },
+    24254: {
+      approvers: new Set(["jolheiser", "yardenshoham"]),
+      blockers: new Set<string>(),
+    },
+    24259: {
+      approvers: new Set(["jolheiser", "delvh"]),
+      blockers: new Set<string>(),
+    },
+    24270: {
+      approvers: new Set(["lunny", "delvh", "silverwind"]),
+      blockers: new Set<string>(),
+    },
   };
   await Promise.all(
-    Object.entries(prToApprovers).map(async ([pr, approvers]) => {
-      assertEquals((await getPrReviewers(Number(pr))).approvers, approvers);
-    }),
+    Object.entries(prToApproversAndBlockers).map(
+      async ([prNumber, approversAndBlockers]) => {
+        const pr = await fetchPr(Number(prNumber));
+        const result = await getPrReviewers(pr);
+        assertEquals(result.approvers, approversAndBlockers.approvers);
+        assertEquals(result.blockers, approversAndBlockers.blockers);
+      },
+    ),
   );
 });
 

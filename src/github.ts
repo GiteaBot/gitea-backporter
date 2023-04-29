@@ -221,7 +221,7 @@ export const getMilestones = async (): Promise<Milestone[]> => {
 };
 
 export const getPrReviewers = async (
-  prNumber: number,
+  pr: { number: number; requested_reviewers: { login: string }[] },
 ): Promise<{ approvers: Set<string>; blockers: Set<string> }> => {
   // load all reviews
   const reviews: {
@@ -236,7 +236,7 @@ export const getPrReviewers = async (
   let page = 1;
   while (true) {
     const response = await fetch(
-      `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/reviews?per_page=100&page=${page}`,
+      `${GITHUB_API}/repos/go-gitea/gitea/pulls/${pr.number}/reviews?per_page=100&page=${page}`,
       { headers: HEADERS },
     );
     if (!response.ok) throw new Error(await response.text());
@@ -268,6 +268,12 @@ export const getPrReviewers = async (
     }
   }
 
+  // any requested reviewers are not approvers nor blockers
+  for (const requestedReviewer of pr.requested_reviewers) {
+    approvers.delete(requestedReviewer.login);
+    blockers.delete(requestedReviewer.login);
+  }
+
   return { approvers, blockers };
 };
 
@@ -278,6 +284,7 @@ export const createBackportPr = async (
     body: string;
     labels: [{ name: string }];
     user: { login: string };
+    requested_reviewers: { login: string }[];
   },
   giteaVersion: GiteaVersion,
 ) => {
@@ -339,7 +346,7 @@ export const createBackportPr = async (
   );
 
   // request review from original PR approvers
-  const { approvers } = await getPrReviewers(originalPr.number);
+  const { approvers } = await getPrReviewers(originalPr);
   await fetch(
     `${GITHUB_API}/repos/go-gitea/gitea/pulls/${json.number}/requested_reviewers`,
     {
