@@ -64,7 +64,13 @@ webhook.on("pull_request.closed", ({ payload }) => {
 // on pull request open, synchronization (push), and pull request review,
 // we'll update the lgtm status check and label
 webhook.on(
-  ["pull_request.opened", "pull_request.synchronize", "pull_request_review"],
+  [
+    "pull_request.opened",
+    "pull_request.synchronize",
+    "pull_request.review_requested",
+    "pull_request.review_request_removed",
+    "pull_request_review",
+  ],
   ({ payload }) => {
     lgtm.setPrStatusAndLabel(payload.pull_request);
   },
