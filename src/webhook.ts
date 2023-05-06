@@ -6,6 +6,7 @@ import * as labels from "./labels.ts";
 import * as mergeQueue from "./mergeQueue.ts";
 import * as milestones from "./milestones.ts";
 import * as lgtm from "./lgtm.ts";
+import * as user from "./user.ts";
 
 const secret = Deno.env.get("BACKPORTER_GITHUB_SECRET");
 
@@ -19,6 +20,7 @@ if (
   );
 }
 
+await user.init();
 const webhook = createEventHandler({});
 
 webhook.on("push", ({ payload }) => {
@@ -61,20 +63,25 @@ webhook.on("pull_request.closed", ({ payload }) => {
   }
 });
 
-// on pull request open, synchronization (push), and pull request review,
-// we'll update the lgtm status check and label
+// on pull request review, we'll update the PR review status echoing
+// non-merger maintainer reviews
 webhook.on(
   [
-    "pull_request.opened",
-    "pull_request.synchronize",
     "pull_request.review_requested",
     "pull_request.review_request_removed",
     "pull_request_review",
   ],
   ({ payload }) => {
-    lgtm.setPrStatusAndLabel(payload.pull_request);
+    // ignore events from the bot itself
+    if (payload.sender.login === user.bot.login) return;
+    lgtm.updatePrReviewStatus(payload.pull_request);
   },
 );
+
+// when a membership changes, we'll update our in-memory cache of maintainers
+webhook.on("membership", () => {
+  lgtm.updateInMemoryMaintainers();
+});
 
 // when PRs close, make sure no unmerged closed PRs have milestones
 webhook.on("pull_request.closed", () => {

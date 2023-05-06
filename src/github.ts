@@ -8,6 +8,95 @@ const HEADERS = {
   Authorization: `Bearer ${Deno.env.get("BACKPORTER_GITHUB_TOKEN")}`,
 };
 
+// return all team members in the maintainers team of the go-gitea organization, excluding those in the mergers team
+export const fetchMaintainersExcludingMergers = async () => {
+  const maintainersExcludingMergers = new Set<string>();
+  let page = 1;
+  while (true) {
+    const response = await fetch(
+      `${GITHUB_API}/orgs/go-gitea/teams/maintainers/members?per_page=100&page=${page}`,
+      { headers: HEADERS },
+    );
+    if (!response.ok) throw new Error(await response.text());
+    const results: [] = await response.json();
+    results.forEach((result: { login: string }) =>
+      maintainersExcludingMergers.add(result.login)
+    );
+    if (results.length < 100) break;
+    page++;
+  }
+
+  const mergers = new Set<string>();
+  page = 1;
+  while (true) {
+    const response = await fetch(
+      `${GITHUB_API}/orgs/go-gitea/teams/mergers/members?per_page=100&page=${page}`,
+      { headers: HEADERS },
+    );
+    if (!response.ok) throw new Error(await response.text());
+    const results: [] = await response.json();
+    results.forEach((result: { login: string }) => mergers.add(result.login));
+    if (results.length < 100) break;
+    page++;
+  }
+
+  // remove mergers from maintainers
+  mergers.forEach((merger) => maintainersExcludingMergers.delete(merger));
+
+  return maintainersExcludingMergers;
+};
+
+// given a PR number, submit a review with the changes requested status
+export const requestChanges = async (prNumber: number) => {
+  const response = await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/reviews`,
+    {
+      method: "POST",
+      headers: HEADERS,
+      body: JSON.stringify({
+        event: "REQUEST_CHANGES",
+        body: "Just making sure GitHub recognizes the maintainer's review",
+      }),
+    },
+  );
+  if (!response.ok) {
+    console.error(await response.text());
+    return;
+  }
+};
+
+// given a PR number, submit a review with the approved status
+export const approve = async (prNumber: number) => {
+  const response = await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/reviews`,
+    {
+      method: "POST",
+      headers: HEADERS,
+      body: JSON.stringify({ event: "APPROVE" }),
+    },
+  );
+  if (!response.ok) {
+    console.error(await response.text());
+    return;
+  }
+};
+
+// given a PR number, request a review from the given user
+export const requestReview = async (prNumber: number, userLogin: string) => {
+  const response = await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/requested_reviewers`,
+    {
+      method: "POST",
+      headers: HEADERS,
+      body: JSON.stringify({ reviewers: [userLogin] }),
+    },
+  );
+  if (!response.ok) {
+    console.error(await response.text());
+    return;
+  }
+};
+
 // return the current user
 export const fetchCurrentUser = async () => {
   const response = await fetch(`${GITHUB_API}/user`, { headers: HEADERS });
@@ -94,26 +183,6 @@ export const updatePr = async (prNumber: number): Promise<Response> => {
     },
   );
   return response;
-};
-
-// sets a commit status
-export const setCommitStatus = (
-  sha: string,
-  state: "error" | "failure" | "pending" | "success",
-  description: string,
-) => {
-  return fetch(
-    `${GITHUB_API}/repos/go-gitea/gitea/statuses/${sha}`,
-    {
-      method: "POST",
-      headers: HEADERS,
-      body: JSON.stringify({
-        state,
-        context: "giteabot/lgtm",
-        description,
-      }),
-    },
-  );
 };
 
 // get a go-gitea/gitea branch

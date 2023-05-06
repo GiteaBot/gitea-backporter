@@ -1,94 +1,61 @@
 import {
-  addLabels,
+  approve,
+  fetchMaintainersExcludingMergers,
   getPrReviewers,
-  removeLabel,
-  setCommitStatus,
+  requestChanges,
+  requestReview,
 } from "./github.ts";
+import { bot } from "./user.ts";
 
-// given a pr number, set its lgtm status check and lgtm label
-export const setPrStatusAndLabel = async (
-  pr: {
-    labels: { name: string }[];
-    head: { sha: string };
-    title: string;
-    number: number;
-    requested_reviewers: { login: string }[];
-  },
-) => {
-  let reviewers;
-  try {
-    reviewers = await getPrReviewers(pr);
-  } catch (error) {
-    console.error(error);
+let maintainers: Set<string>;
+
+export const updateInMemoryMaintainers = async () => {
+  maintainers = await fetchMaintainersExcludingMergers();
+};
+
+export const updatePrReviewStatus = async (pr: {
+  labels: { name: string }[];
+  head: { sha: string };
+  title: string;
+  number: number;
+  requested_reviewers: { login: string }[];
+}) => {
+  if (!maintainers) {
+    updateInMemoryMaintainers();
+  }
+
+  // given a PR and a list of maintainers, make sure that the PR:
+  // - is approved by this bot if a maintainer approves it
+  // - is blocked by this bot if a maintainer requests changes
+  const { approvers, blockers } = await getPrReviewers(pr);
+
+  const maintainersThatApproved = new Set<string>();
+  approvers.forEach((approver) => {
+    if (maintainers.has(approver)) maintainersThatApproved.add(approver);
+  });
+
+  const maintainersThatBlocked = new Set<string>();
+  blockers.forEach((blocker) => {
+    if (maintainers.has(blocker)) maintainersThatBlocked.add(blocker);
+  });
+
+  // if any maintainer has blocked the PR and this bot has not blocked it yet, block it
+  if (maintainersThatBlocked.size > 0 && !blockers.has(bot.login)) {
+    await requestChanges(pr.number);
     return;
   }
 
-  const { state, message, desiredLabel } = getPrStatusAndLabel(reviewers);
-  const currentLgtmLabels = pr.labels.filter((l) => l.name.startsWith("lgtm/"));
-
-  // remove any undesired lgtm labels
-  await Promise.all(
-    currentLgtmLabels.filter((l) => l.name !== desiredLabel).map(
-      async (label) => {
-        const response = await removeLabel(pr.number, label.name);
-        if (response.ok) {
-          console.info(
-            `Removed ${label.name} from "${pr.title}" (#${pr.number})`,
-          );
-        } else {
-          console.error(
-            `Failed to remove ${label.name} from "${pr.title}" (#${pr.number})`,
-          );
-          console.error(await response.text());
-        }
-      },
-    ),
-  );
-
-  // add desired label if it's not there
-  if (!currentLgtmLabels.some((label) => label.name === desiredLabel)) {
-    await addLabels(pr.number, [desiredLabel]);
+  // if any maintainer has approved the PR and this bot has not approved it yet, approve it
+  if (maintainersThatApproved.size > 0 && !approvers.has(bot.login)) {
+    await approve(pr.number);
+    return;
   }
 
-  // set commit status
-  const response = await setCommitStatus(pr.head.sha, state, message);
-  if (response.ok) {
-    console.info(
-      `Set commit status in "${pr.title}" (#${pr.number})`,
-    );
-  } else {
-    console.error(
-      `Failed to set commit status in  "${pr.title}" (#${pr.number})`,
-    );
-    console.error(await response.text());
+  // if no maintainer approved nor blocked the PR and this bot has a review on it, remove the review
+  if (
+    maintainersThatApproved.size === 0 && maintainersThatBlocked.size === 0 &&
+    (approvers.has(bot.login) || blockers.has(bot.login))
+  ) {
+    await requestReview(pr.number, bot.login);
   }
-};
-
-// returns the status, message, and label for a given number of approvals
-export const getPrStatusAndLabel = (
-  reviewers: { approvers: Set<string>; blockers: Set<string> },
-) => {
-  let desiredLabel = "lgtm/need 2";
-  let message = "Needs two more approvals";
-  let state: "pending" | "success" | "failure" = "pending";
-
-  if (reviewers.blockers.size > 0) {
-    desiredLabel = "lgtm/blocked";
-    message = "Blocked by " + Array.from(reviewers.blockers).join(", ");
-    state = "failure";
-    return { state, message, desiredLabel };
-  }
-
-  if (reviewers.approvers.size === 1) {
-    desiredLabel = "lgtm/need 1";
-    message = "Needs one more approval";
-  }
-
-  if (reviewers.approvers.size >= 2) {
-    desiredLabel = "lgtm/done";
-    message = `Approved by ${reviewers.approvers.size} people`;
-    state = "success";
-  }
-
-  return { state, message, desiredLabel };
 };

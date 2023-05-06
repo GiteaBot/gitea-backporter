@@ -6,23 +6,17 @@ import {
   backportPrExists,
   createBackportPr,
   fetchCandidates,
-  fetchCurrentUser,
   fetchPr,
 } from "./github.ts";
+import { bot } from "./user.ts";
 
-if (
-  !Deno.env.get("BACKPORTER_GITEA_FORK") ||
-  !Deno.env.get("BACKPORTER_GITHUB_TOKEN")
-) {
-  console.error(
-    "BACKPORTER_GITEA_FORK and BACKPORTER_GITHUB_TOKEN must be set",
-  );
-}
-
-const user = await fetchCurrentUser();
-await initializeGitRepo(user.login, user.email);
+let initialized = false;
 
 export const run = async () => {
+  if (!initialized) {
+    await initializeGitRepo(bot.login, bot.email);
+    initialized = true;
+  }
   for (const giteaVersion of await fetchGiteaVersions()) {
     const candidates = await fetchCandidates(giteaVersion.majorMinorVersion);
     for (const candidate of candidates.items) {
