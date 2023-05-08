@@ -1,4 +1,10 @@
-import { fetchMergedWithLabel, fetchTargeting, removeLabel } from "./github.ts";
+import {
+  addLabels,
+  fetchBreakingWithoutLabel,
+  fetchMergedWithLabel,
+  fetchTargeting,
+  removeLabel,
+} from "./github.ts";
 import { fetchGiteaVersions } from "./giteaVersion.ts";
 import { debounce } from "https://deno.land/std@0.186.0/async/mod.ts";
 
@@ -17,7 +23,16 @@ const maintain = async () => {
   await Promise.all([
     removeLabelsFromMergedPr(labelsToRemoveAfterMerge),
     removeBackportLabelsFromPrsTargetingReleaseBranches(),
+    addKindBreakingToBreakingPrs(),
   ]);
+};
+
+// add kind/breaking to all breaking PRs that don't have it
+const addKindBreakingToBreakingPrs = async () => {
+  const breakingPrs = await fetchBreakingWithoutLabel();
+  return Promise.all(breakingPrs.items.map(async (pr: { number: number }) => {
+    await addLabels(pr.number, ["kind/breaking"]);
+  }));
 };
 
 const removeLabelFromMergedPr = async (

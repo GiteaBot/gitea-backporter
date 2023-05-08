@@ -46,6 +46,11 @@ webhook.on(
   },
 );
 
+// on pull request open, run the label maintenance
+webhook.on("pull_request.opened", () => {
+  labels.run();
+});
+
 // on pull request creation, we'll automatically set the milestone
 // according to the target branch (if it's a release branch)
 webhook.on("pull_request.opened", ({ payload }) => {

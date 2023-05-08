@@ -81,6 +81,19 @@ export const fetchUnmergedClosedWithMilestone = async (
   return json;
 };
 
+// returns a list of breaking PRs that don't have the label kind/breaking
+export const fetchBreakingWithoutLabel = async () => {
+  const response = await fetch(
+    `${GITHUB_API}/search/issues?q=` +
+      encodeURIComponent(
+        `is:pr "## :warning: BREAKING :warning:" -label:kind/breaking repo:go-gitea/gitea`,
+      ),
+    { headers: HEADERS },
+  );
+  const json = await response.json();
+  return json;
+};
+
 // update a given PR with the latest upstream changes by merging HEAD from
 // the base branch into the pull request branch
 export const updatePr = async (prNumber: number): Promise<Response> => {
