@@ -129,6 +129,10 @@ export const fetchBranch = async (branch: string) => {
 export const needsUpdate = async (prNumber: number) => {
   // get the PR and check if its base sha is the same as its base branch
   const pr = await fetchPr(prNumber);
+
+  // if the PR is not open, it doesn't need to be updated
+  if (pr.state !== "open") return false;
+
   const base = await fetchBranch(pr.base.ref);
   return pr.base.sha !== base.commit.sha;
 };
