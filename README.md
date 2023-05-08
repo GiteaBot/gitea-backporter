@@ -25,9 +25,8 @@ The script will also look for merged pull requests that have the labels
 It will also search for pull requests that target release branches and remove
 any `backport/*` labels from them.
 
-It will also make sure any pull requests that have
-`## :warning: BREAKING :warning:` in their description have the `kind/breaking`
-label.
+It will also make sure any pull requests that have `## :warning: BREAKING` in
+their description have the `kind/breaking` label.
 
 ### Merge queue synchronization
 
