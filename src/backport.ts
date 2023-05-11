@@ -48,7 +48,14 @@ const parseCandidate = async (candidate, giteaVersion: GiteaVersion) => {
   if (!success) {
     await addPrComment(
       originalPr.number,
-      `I was unable to create a backport for ${giteaVersion.majorMinorVersion}. @${originalPr.user.login}, please send one manually. :tea:`,
+      `I was unable to create a backport for ${giteaVersion.majorMinorVersion}. @${originalPr.user.login}, please send one manually. :tea:
+
+\`\`\`
+go run ./contrib/backport ${originalPr.number}
+...  // fix git conflicts if any
+go run ./contrib/backport --continue
+\`\`\`
+`,
     );
     await addLabels(
       originalPr.number,
