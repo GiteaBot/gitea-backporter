@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.186.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.187.0/http/server.ts";
 import { createEventHandler } from "https://esm.sh/@octokit/webhooks@11.0.0";
 import { verify } from "https://esm.sh/@octokit/webhooks-methods@3.0.2";
 import * as backport from "./backport.ts";

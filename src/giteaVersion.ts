@@ -1,4 +1,4 @@
-import { SemVer } from "https://deno.land/std@0.186.0/semver/mod.ts";
+import { SemVer } from "https://deno.land/std@0.187.0/semver/mod.ts";
 import { getMilestones } from "./github.ts";
 
 export class GiteaVersion {

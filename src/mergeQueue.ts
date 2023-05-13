@@ -5,7 +5,7 @@ import {
   removeLabel,
   updatePr,
 } from "./github.ts";
-import { debounce } from "https://deno.land/std@0.186.0/async/mod.ts";
+import { debounce } from "https://deno.land/std@0.187.0/async/mod.ts";
 
 const updateBranch = async () => {
   // fetch all PRs that are pending merge
