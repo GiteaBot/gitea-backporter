@@ -6,7 +6,7 @@ import {
   removeLabel,
 } from "./github.ts";
 import { fetchGiteaVersions } from "./giteaVersion.ts";
-import { debounce } from "https://deno.land/std@0.187.0/async/mod.ts";
+import { debounce } from "https://deno.land/std@0.188.0/async/mod.ts";
 
 // a relevant label is one that is used to control the merge queue,
 // manage backports or any other label that causes the bot to act on

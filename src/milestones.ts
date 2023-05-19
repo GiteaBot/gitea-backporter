@@ -1,4 +1,4 @@
-import * as SemVer from "https://deno.land/std@0.187.0/semver/mod.ts";
+import * as SemVer from "https://deno.land/std@0.188.0/semver/mod.ts";
 import { fetchGiteaVersions } from "./giteaVersion.ts";
 import * as github from "./github.ts";
 

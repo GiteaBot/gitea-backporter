@@ -1,4 +1,4 @@
-import * as semver from "https://deno.land/std@0.187.0/semver/mod.ts";
+import * as semver from "https://deno.land/std@0.188.0/semver/mod.ts";
 import { getPrBranchName } from "./git.ts";
 import { GiteaVersion } from "./giteaVersion.ts";
 
