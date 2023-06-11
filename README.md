@@ -51,6 +51,17 @@ request has. It will also set the commit status to `success` if the pull request
 has 2 or more approvals without changes requested (`pending` if not or `failure`
 if changes are requested).
 
+### Command execution
+
+The script will also execute commands in pull request comments. For example, if
+an organization member comments
+
+```
+@GiteaBot run `make fmt`
+```
+
+the script will run `make fmt` in the pull request's head branch.
+
 ## Usage
 
 Set the following environment variables:
