@@ -6,6 +6,7 @@ import * as labels from "./labels.ts";
 import * as mergeQueue from "./mergeQueue.ts";
 import * as milestones from "./milestones.ts";
 import * as lgtm from "./lgtm.ts";
+import * as comments from "./comments.ts";
 
 const secret = Deno.env.get("BACKPORTER_GITHUB_SECRET");
 
@@ -49,6 +50,11 @@ webhook.on(
 // on pull request open, run the label maintenance
 webhook.on("pull_request.opened", () => {
   labels.run();
+});
+
+// on pull request open, comment if translations changed
+webhook.on("pull_request.opened", ({ payload }) => {
+  comments.commentIfTranslationsChanged(payload.pull_request);
 });
 
 // on pull request creation, we'll automatically set the milestone

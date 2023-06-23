@@ -94,6 +94,25 @@ export const fetchBreakingWithoutLabel = async () => {
   return json;
 };
 
+// returns a list of files changed in the given PR number
+export const fetchPrFileNames = async (prNumber: number) => {
+  const files: { filename: string }[] = [];
+  let page = 1;
+  while (true) {
+    const response = await fetch(
+      `${GITHUB_API}/repos/go-gitea/gitea/pulls/${prNumber}/files?per_page=100&page=${page}`,
+      { headers: HEADERS },
+    );
+    const json = await response.json();
+    files.push(...json);
+    if (json.length < 100) {
+      break;
+    }
+    page++;
+  }
+  return new Set(files.map((file) => file.filename));
+};
+
 // update a given PR with the latest upstream changes by merging HEAD from
 // the base branch into the pull request branch
 export const updatePr = async (prNumber: number): Promise<Response> => {

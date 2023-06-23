@@ -51,6 +51,11 @@ request has. It will also set the commit status to `success` if the pull request
 has 2 or more approvals without changes requested (`pending` if not or `failure`
 if changes are requested).
 
+### Comments
+
+The script will also comment if a pull request is opened with non-English
+translation files changed, directing the user to the crowdin project.
+
 ## Usage
 
 Set the following environment variables:

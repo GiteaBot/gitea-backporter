@@ -1,5 +1,10 @@
 import { assertEquals } from "https://deno.land/std@0.189.0/testing/asserts.ts";
-import { fetchBranch, fetchPr, getPrReviewers } from "./github.ts";
+import {
+  fetchBranch,
+  fetchPr,
+  fetchPrFileNames,
+  getPrReviewers,
+} from "./github.ts";
 
 Deno.test("getPrReviewers() returns the appropriate approvers", async () => {
   const prToApproversAndBlockers = {
@@ -84,4 +89,31 @@ Deno.test("fetchBranch() handles full ref name well", async () => {
     releaseV119Branch._links.html,
     "https://github.com/go-gitea/gitea/tree/release/v1.19",
   );
+});
+
+Deno.test("fetchPrFileNames() returns the appropriate files", async () => {
+  const prToFiles = {
+    25432: new Set([
+      "modules/setting/database.go",
+      "options/locale/locale_en-US.ini",
+      "routers/install/install.go",
+      "services/forms/user_form.go",
+      "templates/install.tmpl",
+    ]),
+    24825: new Set(["models/repo/topic.go"]),
+  };
+
+  await Promise.all(
+    Object.entries(prToFiles).map(
+      async ([prNumber, files]) => {
+        const result = await fetchPrFileNames(Number(prNumber));
+        assertEquals(result, files);
+      },
+    ),
+  );
+});
+
+Deno.test("fetchPrFileNames() can handle big PRs", async () => {
+  const aPrWith669Files = await fetchPrFileNames(24147);
+  assertEquals(aPrWith669Files.size, 669);
 });
