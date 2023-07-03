@@ -52,8 +52,11 @@ webhook.on("pull_request.opened", () => {
   labels.run();
 });
 
-// on pull request open, comment if translations changed
+// on pull request open, comment if translations changed (only if the PR is targeting main)
 webhook.on("pull_request.opened", ({ payload }) => {
+  if (payload.pull_request.base.ref !== "main") {
+    return;
+  }
   comments.commentIfTranslationsChanged(payload.pull_request);
 });
 
