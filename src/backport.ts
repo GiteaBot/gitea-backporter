@@ -1,8 +1,8 @@
 import { cherryPickPr, initializeGitRepo } from "./git.ts";
 import { fetchGiteaVersions, GiteaVersion } from "./giteaVersion.ts";
 import {
+  addComment,
   addLabels,
-  addPrComment,
   backportPrExists,
   createBackportPr,
   fetchCandidates,
@@ -46,7 +46,7 @@ const parseCandidate = async (candidate, giteaVersion: GiteaVersion) => {
   );
 
   if (!success) {
-    await addPrComment(
+    await addComment(
       originalPr.number,
       `I was unable to create a backport for ${giteaVersion.majorMinorVersion}. @${originalPr.user.login}, please send one manually. :tea:
 

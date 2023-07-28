@@ -1,4 +1,4 @@
-import { addPrComment, fetchPrFileNames } from "./github.ts";
+import { addComment, fetchPrFileNames } from "./github.ts";
 
 export const commentIfTranslationsChanged = async (
   pr: { number: number; user: { login: string } },
@@ -12,6 +12,6 @@ export const commentIfTranslationsChanged = async (
   if (translationsChanged) {
     const comment =
       `@${pr.user.login} I noticed you've updated the locales for non-English languages. These will be overwritten during the sync from our translation tool Crowdin. If you'd like to contribute your translations, please visit https://crowdin.com/project/gitea. Please revert the changes done on these files. :tea:`;
-    await addPrComment(pr.number, comment);
+    await addComment(pr.number, comment);
   }
 };

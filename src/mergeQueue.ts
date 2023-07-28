@@ -1,5 +1,5 @@
 import {
-  addPrComment,
+  addComment,
   fetchPendingMerge,
   needsUpdate,
   removeLabel,
@@ -32,7 +32,7 @@ const updateBranch = async () => {
     );
     // if there is a merge conflict, we'll add a comment to fix the conflicts and remove the reviewed/wait-merge label
     await Promise.all([
-      addPrComment(
+      addComment(
         pr.number,
         `@${pr.user.login} please fix the merge conflicts. :tea:`,
       ),

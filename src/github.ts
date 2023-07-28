@@ -413,9 +413,9 @@ export const addLabels = async (prNumber: number, labels: string[]) => {
   await response.json();
 };
 
-export const addPrComment = async (prNumber: number, comment: string) => {
+export const addComment = async (issueNumber: number, comment: string) => {
   const response = await fetch(
-    `${GITHUB_API}/repos/go-gitea/gitea/issues/${prNumber}/comments`,
+    `${GITHUB_API}/repos/go-gitea/gitea/issues/${issueNumber}/comments`,
     {
       method: "POST",
       headers: HEADERS,
@@ -423,5 +423,43 @@ export const addPrComment = async (prNumber: number, comment: string) => {
     },
   );
   await response.json();
-  console.info(`Added comment to PR #${prNumber}`);
+  console.info(`Added comment to #${issueNumber}`);
+};
+
+// locks a given issue
+export const lockIssue = async (
+  issueNumber: number,
+  reason: "off-topic" | "too heated" | "resolved" | "spam",
+) => {
+  const response = await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/issues/${issueNumber}/lock`,
+    {
+      method: "PUT",
+      headers: HEADERS,
+      body: JSON.stringify({ lock_reason: reason }),
+    },
+  );
+  if (!response.ok) {
+    console.error(
+      `Failed to lock issue #${issueNumber}: ${await response.text()}`,
+    );
+    return false;
+  }
+  console.info(`Locked issue #${issueNumber}`);
+  return true;
+};
+
+// returns issues that are unlocked, closed and have been closed before the given date. Only the first 30 results are returned.
+export const fetchClosedOldIssuesAndPRs = async (before: Date) => {
+  // if we ever become a GitHub app, we need to separate the search query into
+  // two queries, one for issues and one for PRs, and then merge the results
+  const response = await fetch(
+    `${GITHUB_API}/search/issues?q=` +
+      encodeURIComponent(
+        `is:closed is:unlocked closed:<${before.toISOString()} repo:go-gitea/gitea`,
+      ),
+    { headers: HEADERS },
+  );
+  const json = await response.json();
+  return json;
 };
