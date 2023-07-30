@@ -22,9 +22,9 @@ export const run = async () => {
         if (lockedSuccessfully && new Date(issue.updated_at) > oneMonthAgo) {
           await addComment(
             issue.number,
-            `Hi, we lock ${
+            `We lock ${
               issue.pull_request ? "pull request" : "issue"
-            }s if 3 months have passed since they were closed. If there's any need for a further discussion, please open a new issue. :tea:`,
+            }s 3 months after they were closed. If there's any need for further discussion, please open a new issue. :tea:`,
           );
         }
       },
