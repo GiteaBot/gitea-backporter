@@ -59,7 +59,7 @@ translation files changed, directing the user to the crowdin project.
 ### Locks
 
 The script will also lock issues and pull requests that have been closed for 3
-months. If the issue was updated in the last month, a comment will be posted
+months. If the issue was updated in the last two weeks, a comment will be posted
 suggesting opening a new issue to continue the discussion.
 
 ## Usage
