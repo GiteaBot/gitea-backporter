@@ -8,7 +8,7 @@ export const run = async () => {
   const threeMonthsAgo = new Date(Date.now() - MILLISECONDS_IN_A_MONTH * 3);
   const issues = await fetchClosedOldIssuesAndPRs(threeMonthsAgo);
   return Promise.all(
-    issues.map(
+    issues.items.map(
       async (
         issue: {
           number: number;
