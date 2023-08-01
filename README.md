@@ -62,6 +62,11 @@ The script will also lock issues and pull requests that have been closed for 3
 months. If the issue was commented on in the last two weeks, a comment will be
 posted suggesting opening a new issue to continue the discussion.
 
+### Maintainer commands
+
+The script can execute some actions like updating a PR's branch if requested by
+a maintainer through a `giteabot/*` label.
+
 ## Usage
 
 Set the following environment variables:

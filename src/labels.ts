@@ -12,7 +12,7 @@ import { debounce } from "https://deno.land/std@0.189.0/async/mod.ts";
 // manage backports or any other label that causes the bot to act on
 // detection, such as reviewed/* or backport/*
 export const isRelevantLabel = (label: string): boolean => {
-  return label.startsWith("reviewed/") || label.startsWith("backport/");
+  return label.startsWith("reviewed/") || label.startsWith("backport/") || label.startsWith("giteabot/");
 };
 
 const maintain = async () => {

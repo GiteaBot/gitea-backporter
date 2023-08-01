@@ -8,6 +8,7 @@ import * as milestones from "./milestones.ts";
 import * as lgtm from "./lgtm.ts";
 import * as comments from "./comments.ts";
 import * as lock from "./lock.ts";
+import * as prActions from "./prActions.ts";
 
 const secret = Deno.env.get("BACKPORTER_GITHUB_SECRET");
 
@@ -45,6 +46,7 @@ webhook.on(
     if (labels.isRelevantLabel(payload.label.name)) {
       labels.run();
       mergeQueue.run();
+      prActions.run(payload.label.name, payload.pull_request);
     }
   },
 );
