@@ -1,9 +1,4 @@
-import {
-  addComment,
-  needsUpdate,
-  removeLabel,
-  updatePr,
-} from "./github.ts";
+import { addComment, needsUpdate, removeLabel, updatePr } from "./github.ts";
 import { debounce } from "https://deno.land/std@0.189.0/async/mod.ts";
 
 const execute = async (
@@ -26,7 +21,7 @@ const updateBranch = async (
       console.info(`Synced PR #${pr.number} as requested by a maintainer`);
       return;
     }
-    
+
     const body = await response.json();
     if (body.message !== "merge conflict between base and head") {
       console.error(
