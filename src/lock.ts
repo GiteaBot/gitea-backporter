@@ -1,4 +1,9 @@
-import { addComment, fetchClosedOldIssuesAndPRs, lockIssue } from "./github.ts";
+import {
+  addComment,
+  fetchClosedOldIssuesAndPRs,
+  fetchLastComment,
+  lockIssue,
+} from "./github.ts";
 
 const MILLISECONDS_IN_A_DAY = 1000 * 60 * 60 * 24;
 
@@ -18,8 +23,14 @@ export const run = async () => {
       ) => {
         const lockedSuccessfully = await lockIssue(issue.number, "resolved");
 
-        // if the issue was updated in the two weeks, we add a comment
-        if (lockedSuccessfully && new Date(issue.updated_at) > twoWeeksAgo) {
+        const lastComment = await fetchLastComment(issue.number);
+        let activeDiscussion = false;
+        if (lastComment) {
+          activeDiscussion = new Date(lastComment.created_at) > twoWeeksAgo;
+        }
+
+        // if the issue was commented on in the two weeks, we add a comment
+        if (lockedSuccessfully && activeDiscussion) {
           await addComment(
             issue.number,
             `We lock ${

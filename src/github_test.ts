@@ -1,6 +1,10 @@
-import { assertEquals } from "https://deno.land/std@0.189.0/testing/asserts.ts";
+import {
+  assertEquals,
+  assertFalse,
+} from "https://deno.land/std@0.189.0/testing/asserts.ts";
 import {
   fetchBranch,
+  fetchLastComment,
   fetchPr,
   fetchPrFileNames,
   getPrReviewers,
@@ -116,4 +120,27 @@ Deno.test("fetchPrFileNames() returns the appropriate files", async () => {
 Deno.test("fetchPrFileNames() can handle big PRs", async () => {
   const aPrWith669Files = await fetchPrFileNames(24147);
   assertEquals(aPrWith669Files.size, 669);
+});
+
+Deno.test("fetchLastComment() returns the appropriate comment", async () => {
+  const prToLastComment = {
+    10: "Closing as fixed by #199 ",
+    29: null,
+    1000: "LGTM",
+    10000:
+      "It is a feature of SQL databases. The repo id is stored in the database and uses auto increment:\r\nhttps://www.w3schools.com/sql/sql_autoincrement.asp",
+  };
+  await Promise.all(
+    Object.entries(prToLastComment).map(
+      async ([issueNumber, comment]) => {
+        const result = await fetchLastComment(Number(issueNumber));
+        if (comment === null) {
+          assertFalse(result);
+          return;
+        }
+
+        assertEquals(result.body, comment);
+      },
+    ),
+  );
 });

@@ -463,3 +463,14 @@ export const fetchClosedOldIssuesAndPRs = async (before: Date) => {
   const json = await response.json();
   return json;
 };
+
+// returns the last comment of the given issue
+export const fetchLastComment = async (issueNumber: number) => {
+  const response = await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/issues/${issueNumber}/comments?per_page=1&sort=created&direction=desc`,
+    { headers: HEADERS },
+  );
+  const json = await response.json();
+  if (json.length === 0) return null;
+  return json[0];
+};
