@@ -471,6 +471,6 @@ export const fetchLastComment = async (issueNumber: number) => {
     { headers: HEADERS },
   );
   const json = await response.json();
-  if (json.length === 0) return null;
+  if (!json.length) return null;
   return json[0];
 };

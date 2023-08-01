@@ -134,11 +134,7 @@ Deno.test("fetchLastComment() returns the appropriate comment", async () => {
     Object.entries(prToLastComment).map(
       async ([issueNumber, comment]) => {
         const result = await fetchLastComment(Number(issueNumber));
-        if (comment === null) {
-          assertFalse(result);
-          return;
-        }
-
+        if (!comment) return assertFalse(result);
         assertEquals(result.body, comment);
       },
     ),
