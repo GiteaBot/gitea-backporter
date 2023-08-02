@@ -14,7 +14,7 @@ const execute = async (
           pr.number,
           `Failed to update branch :tea:`,
         );
-      }  
+      }
       await removeLabel(pr.number, "giteabot/update-branch");
     }
   }
@@ -47,7 +47,7 @@ export const updateBranch = async (
       pr.number,
       `@${pr.user.login} please fix the merge conflicts. :tea:`,
     );
-    return Error("merge conflicts in PR")
+    return Error("merge conflicts in PR");
   }
 };
 
