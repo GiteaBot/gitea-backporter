@@ -5,11 +5,9 @@ const execute = async (
   label: string,
   pr: { number: number; user: { login: string } },
 ) => {
-  switch (label) {
-    case "giteabot/update-branch": {
-      await updateBranch(pr);
-      await removeLabel(pr.number, "giteabot/update-branch");
-    }
+  if (label === "giteabot/update-branch") {
+    await updateBranch(pr);
+    await removeLabel(pr.number, "giteabot/update-branch");
   }
 };
 
