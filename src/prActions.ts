@@ -6,33 +6,37 @@ const execute = async (
   pr: { number: number; user: { login: string } },
 ) => {
   switch (label) {
-    case "giteabot/update-branch":
-      await updateBranch(pr);
+    case "giteabot/update-branch": {
+      const err = await updateBranch(pr);
+      if (err?.message == "failed to sync PR") {
+        // notify maintainer about failed update
+        await addComment(
+          pr.number,
+          `Failed to update branch :tea:`,
+        );
+      }  
+      await removeLabel(pr.number, "giteabot/update-branch");
+    }
   }
 };
 
-const updateBranch = async (
+export const updateBranch = async (
   pr: { number: number; user: { login: string } },
 ) => {
-  await removeLabel(pr.number, "giteabot/update-branch");
   if (await needsUpdate(pr.number)) {
     const response = await updatePr(pr.number);
     if (response.ok) {
-      console.info(`Synced PR #${pr.number} as requested by a maintainer`);
+      console.info(`Synced PR #${pr.number}`);
       return;
     }
 
     const body = await response.json();
     if (body.message !== "merge conflict between base and head") {
       console.error(
-        `Failed to sync PR #${pr.number} as requested by maintainer`,
+        `Failed to sync PR #${pr.number}`,
       );
       console.error(JSON.stringify(body));
-      await addComment(
-        pr.number,
-        `Failed to update branch :tea:`,
-      );
-      return;
+      return Error("failed to sync PR");
     }
 
     console.info(
@@ -43,6 +47,7 @@ const updateBranch = async (
       pr.number,
       `@${pr.user.login} please fix the merge conflicts. :tea:`,
     );
+    return Error("merge conflicts in PR")
   }
 };
 
