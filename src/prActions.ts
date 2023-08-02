@@ -7,14 +7,7 @@ const execute = async (
 ) => {
   switch (label) {
     case "giteabot/update-branch": {
-      const err = await updateBranch(pr);
-      if (err?.message == "failed to sync PR") {
-        // notify maintainer about failed update
-        await addComment(
-          pr.number,
-          `Failed to update branch :tea:`,
-        );
-      }
+      await updateBranch(pr);
       await removeLabel(pr.number, "giteabot/update-branch");
     }
   }
@@ -36,7 +29,6 @@ export const updateBranch = async (
         `Failed to sync PR #${pr.number}`,
       );
       console.error(JSON.stringify(body));
-      return Error("failed to sync PR");
     }
 
     console.info(
