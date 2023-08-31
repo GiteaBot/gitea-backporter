@@ -307,10 +307,9 @@ export const getPrReviewers = async (
     }
   }
 
-  // any requested reviewers are not approvers nor blockers
+  // any requested reviewers are not approvers
   for (const requestedReviewer of pr.requested_reviewers) {
     approvers.delete(requestedReviewer.login);
-    blockers.delete(requestedReviewer.login);
   }
 
   return { approvers, blockers };
