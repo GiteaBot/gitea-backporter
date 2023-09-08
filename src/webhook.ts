@@ -9,6 +9,7 @@ import * as lgtm from "./lgtm.ts";
 import * as comments from "./comments.ts";
 import * as lock from "./lock.ts";
 import * as prActions from "./prActions.ts";
+import * as feedback from "./feedback.ts";
 
 const secret = Deno.env.get("BACKPORTER_GITHUB_SECRET");
 
@@ -31,10 +32,11 @@ webhook.on("push", ({ payload }) => {
     backport.run();
   }
 
-  // we should take this opportunity to run the label, merge queue, and lock maintenance
+  // we should take this opportunity to run the label, merge queue, lock, and feedback maintenance
   labels.run();
   mergeQueue.run();
   lock.run();
+  feedback.run();
 });
 
 // on pull request labeling events, run the label and merge queue maintenance

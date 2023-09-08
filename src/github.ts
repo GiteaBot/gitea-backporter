@@ -40,6 +40,19 @@ export const fetchMergedWithLabel = async (label: string) => {
   return json;
 };
 
+// returns a list of open issues with the given label
+export const fetchOpenIssuesWithLabel = async (label: string) => {
+  const response = await fetch(
+    `${GITHUB_API}/search/issues?q=` +
+      encodeURIComponent(
+        `is:issue is:open label:${label} repo:go-gitea/gitea`,
+      ),
+    { headers: HEADERS },
+  );
+  const json = await response.json();
+  return json;
+};
+
 // returns a list of PRs pending merge (have the label reviewed/wait-merge)
 export const fetchPendingMerge = async () => {
   const response = await fetch(
@@ -475,4 +488,17 @@ export const fetchLastComment = async (issueNumber: number) => {
   const json = await response.json();
   if (!json.length) return null;
   return json[0];
+};
+
+// closes the given issue
+export const closeIssue = async (issueNumber: number) => {
+  const response = await fetch(
+    `${GITHUB_API}/repos/go-gitea/gitea/issues/${issueNumber}`,
+    {
+      method: "PATCH",
+      headers: HEADERS,
+      body: JSON.stringify({ state: "closed" }),
+    },
+  );
+  return response.json();
 };
