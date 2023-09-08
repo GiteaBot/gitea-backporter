@@ -13,8 +13,8 @@ const handleIssue = async (issue: {
   number: number;
   updated_at: string;
 }) => {
-  const oneMonthAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
-  if (new Date(issue.updated_at) < oneMonthAgo) {
+  const oneMonthAgo = (new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)).getTime();
+  if ((new Date(issue.updated_at)).getTime() < oneMonthAgo) {
     console.log(`Closing issue #${issue.number} due to feedback timeout`);
     await addComment(
       issue.number,
