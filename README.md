@@ -26,7 +26,7 @@ It will also search for pull requests that target release branches and remove
 any `backport/*` labels from them.
 
 It will also make sure any pull requests that have `## :warning: BREAKING` in
-their description have the `kind/breaking` label.
+their description have the `pr/breaking` label.
 
 ### Merge queue synchronization
 

@@ -94,12 +94,12 @@ export const fetchUnmergedClosedWithMilestone = async (
   return json;
 };
 
-// returns a list of breaking PRs that don't have the label kind/breaking
+// returns a list of breaking PRs that don't have the label pr/breaking
 export const fetchBreakingWithoutLabel = async () => {
   const response = await fetch(
     `${GITHUB_API}/search/issues?q=` +
       encodeURIComponent(
-        `is:pr "## :warning: BREAKING" -label:kind/breaking repo:go-gitea/gitea`,
+        `is:pr "## :warning: BREAKING" -label:pr/breaking repo:go-gitea/gitea`,
       ),
     { headers: HEADERS },
   );

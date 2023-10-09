@@ -28,11 +28,11 @@ const maintain = async () => {
   ]);
 };
 
-// add kind/breaking to all breaking PRs that don't have it
+// add pr/breaking to all breaking PRs that don't have it
 const addKindBreakingToBreakingPrs = async () => {
   const breakingPrs = await fetchBreakingWithoutLabel();
   return Promise.all(breakingPrs.items.map(async (pr: { number: number }) => {
-    await addLabels(pr.number, ["kind/breaking"]);
+    await addLabels(pr.number, ["pr/breaking"]);
   }));
 };
 
