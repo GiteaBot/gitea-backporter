@@ -3,7 +3,7 @@ import { addComment, closeIssue, fetchOpenIssuesWithLabel } from "./github.ts";
 export const run = async () => {
   // get all issues with the label "status/needs-feedback"
   const issuesWithStatusNeedsFeedback = await fetchOpenIssuesWithLabel(
-    "status/needs-feedback",
+    "issue/needs-feedback",
   );
   return Promise.all(issuesWithStatusNeedsFeedback.items.map(handleIssue));
 };

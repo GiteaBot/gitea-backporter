@@ -64,7 +64,7 @@ posted suggesting opening a new issue to continue the discussion.
 
 ### Feedback
 
-The script will close issues with the label `status/needs-feedback` if a month
+The script will close issues with the label `issue/needs-feedback` if a month
 has passed since they were updated.
 
 ### Maintainer commands
