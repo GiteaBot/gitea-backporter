@@ -20,6 +20,7 @@ const maintain = async () => {
   const labelsToRemoveAfterMerge = [
     "reviewed/wait-merge",
     "reviewed/prioritize-merge",
+    "pr/last-call",
   ];
   await Promise.all([
     removeLabelsFromMergedPr(labelsToRemoveAfterMerge),
