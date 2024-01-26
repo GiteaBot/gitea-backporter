@@ -72,6 +72,11 @@ has passed since they were updated.
 The script can execute some actions like updating a PR's branch if requested by
 a maintainer through a `giteabot/*` label.
 
+### Last call
+
+The script will close PRs with the label `pr/last-call` if two weeks have passed
+since they were updated.
+
 ## Usage
 
 Set the following environment variables:

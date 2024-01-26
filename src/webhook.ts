@@ -10,6 +10,7 @@ import * as comments from "./comments.ts";
 import * as lock from "./lock.ts";
 import * as prActions from "./prActions.ts";
 import * as feedback from "./feedback.ts";
+import * as lastCall from "./lastCall.ts";
 
 const secret = Deno.env.get("BACKPORTER_GITHUB_SECRET");
 
@@ -32,11 +33,12 @@ webhook.on("push", ({ payload }) => {
     backport.run();
   }
 
-  // we should take this opportunity to run the label, merge queue, lock, and feedback maintenance
+  // we should take this opportunity to run the label, merge queue, lock, feedback, and last call maintenance
   labels.run();
   mergeQueue.run();
   lock.run();
   feedback.run();
+  lastCall.run();
 });
 
 // on pull request labeling events, run the label and merge queue maintenance
