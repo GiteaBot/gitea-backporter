@@ -70,18 +70,13 @@ export const cherryPickPr = async (
   });
 
   // cherry-pick the PR
-  const cherryPickStatus = await cmd.run("git", {
+  const { success, stdout, stderr } = await cmd.run("git", {
     cwd: "gitea",
     args: ["cherry-pick", commitHash],
   });
 
-  if (!cherryPickStatus.success) {
-    console.error(
-      "Cherry-pick failed:",
-      cherryPickStatus.stdout,
-      "\n",
-      cherryPickStatus.stderr,
-    );
+  if (!success) {
+    console.error(`Cherry-pick failed:\n${stdout}\n${stderr}`.trim());
     await cmd.run("git", {
       cwd: "gitea",
       args: ["cherry-pick", "--abort"],
