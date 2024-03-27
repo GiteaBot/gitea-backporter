@@ -76,7 +76,11 @@ export const cherryPickPr = async (
   });
 
   if (!success) {
-    console.error(`Cherry-pick failed:\n${stdout}\n${stderr}`.trim());
+    console.error(
+      `Cherry-pick failed:\n${String.fromCharCode(...stdout)}\n${
+        String.fromCharCode(...stderr)
+      }`.trim(),
+    );
     await cmd.run("git", {
       cwd: "gitea",
       args: ["cherry-pick", "--abort"],
