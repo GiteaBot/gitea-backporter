@@ -5,6 +5,8 @@ export const getPrBranchName = (
   giteaMajorMinorVersion: string,
 ) => `backport-${prNumber}-v${giteaMajorMinorVersion}`;
 
+const decoder = new TextDecoder();
+
 export const initializeGitRepo = async (user: string, email: string | null) => {
   await cmd.run("git", {
     args: [
@@ -77,8 +79,8 @@ export const cherryPickPr = async (
 
   if (!success) {
     console.error(
-      `Cherry-pick failed:\n${String.fromCharCode(...stdout)}\n${
-        String.fromCharCode(...stderr)
+      `Cherry-pick failed:\n${decoder.decode(stdout)}\n${
+        decoder.decode(stderr)
       }`.trim(),
     );
     await cmd.run("git", {
