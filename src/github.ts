@@ -245,7 +245,7 @@ export const backportPrExists = async (
   pr: { number: number },
   giteaMajorMinorVersion: string,
 ) => {
-  const response = await fetch(
+  let response = await fetch(
     `${GITHUB_API}/search/issues?q=` +
       encodeURIComponent(
         `is:pr is:open repo:go-gitea/gitea base:release/v${giteaMajorMinorVersion} ${pr.number} in:title`,
@@ -253,7 +253,16 @@ export const backportPrExists = async (
     { headers: HEADERS },
   );
   const json = await response.json();
-  return json.total_count > 0;
+  if (json.total_count > 0) return true;
+
+  // also check if a branch that looks like the backport branch (getPrBranchName) exists
+  response = await fetch(
+    `${GITHUB_API}/repos/${Deno.env.get("BACKPORTER_GITEA_FORK")}/branches/${
+      getPrBranchName(pr.number, giteaMajorMinorVersion)
+    }`,
+    { headers: HEADERS },
+  );
+  return response.ok;
 };
 
 type Milestone = { title: string; number: number };
