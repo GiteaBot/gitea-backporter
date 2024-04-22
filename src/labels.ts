@@ -56,7 +56,7 @@ const removeLabelsFromMergedPr = (labels: string[]) => {
   return Promise.all(labels.map(async (label) => {
     const prsThatAreMergedAndHaveTheLabel = await fetchMergedWithLabel(label);
     return Promise.all(
-      prsThatAreMergedAndHaveTheLabel.items.map(
+      prsThatAreMergedAndHaveTheLabel?.items?.map(
         (pr: { title: string; number: number }) =>
           removeLabelFromMergedPr(pr, label),
       ),
