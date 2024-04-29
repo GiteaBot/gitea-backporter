@@ -36,6 +36,10 @@ export const fetchMergedWithLabel = async (label: string) => {
       ),
     { headers: HEADERS },
   );
+  if (!response.ok) {
+    console.error(await response.text());
+    return;
+  }
   const json = await response.json();
   return json;
 };
