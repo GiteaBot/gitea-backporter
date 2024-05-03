@@ -1,7 +1,7 @@
 import * as semver from "https://deno.land/std@0.189.0/semver/mod.ts";
 import { getPrBranchName } from "./git.ts";
 import { GiteaVersion } from "./giteaVersion.ts";
-import { backportPrExistsCache } from "./state.ts";
+import memize from "npm:memize@2.1.0";
 
 const GITHUB_API = "https://api.github.com";
 const HEADERS = {
@@ -246,16 +246,10 @@ export const removeMilestone = (prNumber: number) => {
 };
 
 // returns true if a backport PR exists for the given PR number and Gitea version
-export const backportPrExists = async (
+const backportPrExistsUnmemoaized = async (
   pr: { number: number },
   giteaMajorMinorVersion: string,
 ) => {
-  // check the cache first
-  const cacheKey = `${pr.number}_${giteaMajorMinorVersion}`;
-  if (backportPrExistsCache.has(cacheKey)) {
-    return true;
-  }
-
   let response = await fetch(
     `${GITHUB_API}/search/issues?q=` +
       encodeURIComponent(
@@ -264,10 +258,7 @@ export const backportPrExists = async (
     { headers: HEADERS },
   );
   const json = await response.json();
-  if (json.total_count > 0) {
-    backportPrExistsCache.add(cacheKey);
-    return true;
-  }
+  if (json.total_count > 0) return true;
 
   // also check if a branch that looks like the backport branch (getPrBranchName) exists
   response = await fetch(
@@ -276,12 +267,9 @@ export const backportPrExists = async (
     }`,
     { headers: HEADERS, method: "HEAD" },
   );
-  if (response.ok) {
-    backportPrExistsCache.add(cacheKey);
-    return true;
-  }
-  return false;
+  return response.ok;
 };
+export const backportPrExists = memize(backportPrExistsUnmemoaized);
 
 type Milestone = { title: string; number: number };
 
