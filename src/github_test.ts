@@ -149,15 +149,13 @@ Deno.test("backportPrExists() returns the appropriate result", async () => {
     "30511_1.20": false,
   };
   await Promise.all(
-    Object.entries(prAndVersionToBackportExists).map(
-      async ([prAndVersion, backportExists]) => {
-        const [prNumber, version] = prAndVersion.split("_");
-        const result = await backportPrExists(
-          { number: Number(prNumber) },
-          version,
-        );
-        assertEquals(result, backportExists);
-      },
-    ),
+    Object.entries(prAndVersionToBackportExists).map(async ([prAndVersion, backportExists]) => {
+      const [prNumber, version] = prAndVersion.split("_");
+      const result = await backportPrExists(
+        { number: Number(prNumber) },
+        version,
+      );
+      assertEquals(result, backportExists);
+    }),
   );
 });
