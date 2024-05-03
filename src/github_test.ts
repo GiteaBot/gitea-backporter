@@ -3,6 +3,7 @@ import {
   assertFalse,
 } from "https://deno.land/std@0.189.0/testing/asserts.ts";
 import {
+  backportPrExists,
   fetchBranch,
   fetchLastComment,
   fetchPr,
@@ -136,6 +137,26 @@ Deno.test("fetchLastComment() returns the appropriate comment", async () => {
         const result = await fetchLastComment(Number(issueNumber));
         if (!comment) return assertFalse(result);
         assertEquals(result.body, comment);
+      },
+    ),
+  );
+});
+
+Deno.test("backportPrExists() returns the appropriate result", async () => {
+  const prAndVersionToBackportExists = {
+    "30511_1.22": true,
+    "30511_1.21": true,
+    "30511_1.20": false,
+  };
+  await Promise.all(
+    Object.entries(prAndVersionToBackportExists).map(
+      async ([prAndVersion, backportExists]) => {
+        const [prNumber, version] = prAndVersion.split("_");
+        const result = await backportPrExists(
+          { number: Number(prNumber) },
+          version,
+        );
+        assertEquals(result, backportExists);
       },
     ),
   );
