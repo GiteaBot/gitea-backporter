@@ -291,6 +291,7 @@ export const getMilestones = async (): Promise<Milestone[]> => {
     `${GITHUB_API}/repos/go-gitea/gitea/milestones`,
     { headers: HEADERS },
   );
+  if (!response.ok) throw new Error(await response.text());
   const json = await response.json();
   const milestones: Milestone[] = json.filter((m: Milestone) =>
     semver.valid(m.title)
