@@ -1,5 +1,3 @@
-name: Deno
-
 on:
   push:
     branches: ["main"]
@@ -12,14 +10,13 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v1
-      - run: deno fmt --check
-      - run: deno lint
-      - run: shopt -s globstar; deno check src/**/*.ts
-      - run: deno test -A
+      - run: make fmt
+      - run: make lint
+      - run: make check
+      - run: make test
         env:
           BACKPORTER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BACKPORTER_GITEA_FORK: GiteaBot/gitea
