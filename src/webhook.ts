@@ -94,6 +94,7 @@ webhook.on(
     "pull_request_review",
   ],
   ({ payload }) => {
+    // @ts-expect-error -- unknown
     lgtm.setPrStatusAndLabel(payload.pull_request);
   },
 );
@@ -128,6 +129,7 @@ serve(async (req: Request) => {
         status: 400,
       });
     }
+    // @ts-expect-error -- unknown
     webhook.receive({ id, name, payload: JSON.parse(requestBody) });
 
     return Response.json({ message: "Webhook received" });

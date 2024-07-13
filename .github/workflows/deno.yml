@@ -14,20 +14,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup repo
-        uses: actions/checkout@v3
-
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-
-      - name: Verify formatting
-        run: deno fmt --check
-
-      - name: Run linter
-        run: deno lint
-
-      - name: Run tests
-        run: deno test -A
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v1
+      - run: deno fmt --check
+      - run: deno lint
+      - run: shopt -s globstar; deno check src/**/*.ts
+      - run: deno test -A
         env:
           BACKPORTER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BACKPORTER_GITEA_FORK: GiteaBot/gitea

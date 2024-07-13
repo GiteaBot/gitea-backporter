@@ -9,6 +9,7 @@ import {
   fetchCurrentUser,
   fetchPr,
 } from "./github.ts";
+import type { Issue } from "./types.ts";
 
 if (
   !Deno.env.get("BACKPORTER_GITEA_FORK") ||
@@ -32,7 +33,7 @@ export const run = async () => {
   }
 };
 
-const parseCandidate = async (candidate, giteaVersion: GiteaVersion) => {
+const parseCandidate = async (candidate: Issue, giteaVersion: GiteaVersion) => {
   if (await backportPrExists(candidate, giteaVersion.majorMinorVersion)) {
     console.log(`Backport PR already exists for #${candidate.number}`);
     return;

@@ -7,6 +7,7 @@ import {
 } from "./github.ts";
 import { fetchGiteaVersions } from "./giteaVersion.ts";
 import { debounce } from "https://deno.land/std@0.189.0/async/mod.ts";
+import type { PullRequest } from "./types.ts";
 
 // a relevant label is one that is used to control the merge queue,
 // manage backports or any other label that causes the bot to act on
@@ -77,15 +78,11 @@ export const removeBackportLabelsFromPrsTargetingReleaseBranches = async () => {
 };
 
 // given a list of PRs, removes the backport/* labels from them
-export const removeBackportLabelsFromPrs = (prs) => {
+export const removeBackportLabelsFromPrs = (prs: PullRequest[]) => {
   if (prs === undefined) {
     throw new Error("removeBackportLabelsFromPrs called with undefined");
   }
-  return Promise.all(prs.flatMap((pr: {
-    title;
-    labels;
-    number: number;
-  }) => {
+  return Promise.all(prs.flatMap((pr: PullRequest) => {
     const backportLabels = pr.labels.filter((label: { name: string }) =>
       label.name.startsWith("backport/")
     );
