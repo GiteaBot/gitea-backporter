@@ -12,4 +12,4 @@ fmt:
 
 @PHONY: test
 test:
-	@deno test -A
+	@deno test --quiet -A
