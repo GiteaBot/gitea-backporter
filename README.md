@@ -99,7 +99,7 @@ webhook on `/trigger` to run this bot.
 ## Development
 
 - `make fmt` runs the formatter
-- `make lint` runs the linter and type checker
+- `make lint` runs the linter and checks formatting and types
 - `make test` runs the tests
 
 ## Contributing
