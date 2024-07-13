@@ -8,7 +8,7 @@ lint:
 
 @PHONY: fmt
 fmt:
-	@deno fmt
+	@deno fmt --quiet
 
 @PHONY: test
 test:
