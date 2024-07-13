@@ -1,7 +1,4 @@
-import {
-  assertEquals,
-  assertFalse,
-} from "@std/testing/asserts";
+import { assertEquals, assertFalse } from "@std/testing/asserts";
 import {
   backportPrExists,
   fetchBranch,
