@@ -5,9 +5,13 @@ lint:
 	@deno lint
 	@deno check $(SRC_FILES)
 
+@PHONY: fmt-check
+fmt-check:
+	@deno fmt --check
+
 @PHONY: fmt
 fmt:
-	@deno fmt --check
+	@deno fmt
 
 @PHONY: test
 test:

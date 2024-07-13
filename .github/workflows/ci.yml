@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v1
-      - run: make fmt
+      - run: make fmt-check
       - run: make lint
       - run: make test
         env:
