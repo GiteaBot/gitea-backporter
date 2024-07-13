@@ -96,6 +96,12 @@ deno run --allow-net --allow-env --allow-run --allow-sys src/webhook.ts
 This will spin up a web server on port 8000. You can then set up a GitHub
 webhook on `/trigger` to run this bot.
 
+## Development
+
+- `make fmt` runs the formatter
+- `make lint` runs the linter and checks formatting and types
+- `make test` runs the tests
+
 ## Contributing
 
 Contributions are welcome!
