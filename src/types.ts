@@ -1,4 +1,4 @@
-import { Endpoints } from "npm:@octokit/types@13.5.0";
+import { Endpoints } from "@octokit/types";
 
 type IssueGetResponse =
   Endpoints["GET /repos/{owner}/{repo}/issues/{issue_number}"]["response"][

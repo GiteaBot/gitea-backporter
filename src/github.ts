@@ -1,4 +1,4 @@
-import * as semver from "https://deno.land/std@0.189.0/semver/mod.ts";
+import { lt, parse, valid } from "@std/semver";
 import { getPrBranchName } from "./git.ts";
 import { GiteaVersion } from "./giteaVersion.ts";
 import { backportPrExistsCache } from "./state.ts";
@@ -293,18 +293,16 @@ export const getMilestones = async (): Promise<Milestone[]> => {
   );
   if (!response.ok) throw new Error(await response.text());
   const json = await response.json();
-  const milestones: Milestone[] = json.filter((m: Milestone) =>
-    semver.valid(m.title)
-  );
+  const milestones: Milestone[] = json.filter((m: Milestone) => valid(m.title));
 
   // take only the earliest patch version of each minor version (e.g. 1.19.0, 1.19.1, 1.19.2 -> 1.19.0)
   const earliestPatchVersions: Record<string, Milestone> = {};
   for (const milestone of milestones) {
-    const version = new semver.SemVer(milestone.title);
+    const version = parse(milestone.title);
     const key = `${version.major}.${version.minor}`;
     if (
       !earliestPatchVersions[key] ||
-      semver.lt(milestone.title, earliestPatchVersions[key].title)
+      lt(milestone.title, earliestPatchVersions[key].title)
     ) {
       earliestPatchVersions[key] = milestone;
     }
