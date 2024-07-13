@@ -1,4 +1,4 @@
-import { SemVer } from "https://deno.land/std@0.189.0/semver/mod.ts";
+import { parse } from "@std/semver";
 import { getMilestones } from "./github.ts";
 
 export class GiteaVersion {
@@ -6,7 +6,7 @@ export class GiteaVersion {
   milestoneNumber: number;
 
   constructor(milestone: { title: string; number: number }) {
-    const semver = new SemVer(milestone.title);
+    const semver = parse(milestone.title);
     this.majorMinorVersion = `${semver.major}.${semver.minor}`;
     this.milestoneNumber = milestone.number;
   }

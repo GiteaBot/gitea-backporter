@@ -1,0 +1,11 @@
+{
+  "imports": {
+    "@octokit/types": "npm:@octokit/types@13.5.0",
+    "@octokit/webhooks": "npm:@octokit/webhooks@11.0.0",
+    "@octokit/webhooks-methods": "npm:@octokit/webhooks-methods@3.0.2",
+    "@std/async": "jsr:@std/async@0.196.0",
+    "@std/http": "jsr:@std/http@0.196.0",
+    "@std/semver": "jsr:@std/semver@0.196.0",
+    "@std/testing": "jsr:@std/testing@0.196.0"
+  }
+}

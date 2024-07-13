@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.189.0/http/server.ts";
-import { createEventHandler } from "https://esm.sh/@octokit/webhooks@11.0.0";
-import { verify } from "https://esm.sh/@octokit/webhooks-methods@3.0.2";
+import { serve } from "@std/http";
+import { createEventHandler } from "@octokit/webhooks";
+import { verify } from "@octokit/webhooks-methods";
 import * as backport from "./backport.ts";
 import * as labels from "./labels.ts";
 import * as mergeQueue from "./mergeQueue.ts";

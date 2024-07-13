@@ -1,5 +1,5 @@
 import { addComment, needsUpdate, removeLabel, updatePr } from "./github.ts";
-import { debounce } from "https://deno.land/std@0.189.0/async/mod.ts";
+import { debounce } from "@std/async";
 
 const execute = async (
   label: string,
