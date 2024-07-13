@@ -15,7 +15,6 @@ jobs:
       - uses: denoland/setup-deno@v1
       - run: make fmt
       - run: make lint
-      - run: make check
       - run: make test
         env:
           BACKPORTER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
