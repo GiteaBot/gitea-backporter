@@ -75,7 +75,8 @@ a maintainer through a `giteabot/*` label.
 ### Last call
 
 The script will close PRs with the label `pr/last-call` if two weeks have passed
-since they were updated.
+since they were updated. If one week has passed since they were updated, it will
+remind the TOC to review the PR.
 
 ## Usage
 
