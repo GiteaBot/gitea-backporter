@@ -72,6 +72,10 @@ export const removeBackportLabelsFromPrsTargetingReleaseBranches = async () => {
   // versions
   return Promise.all(giteaVersions.map(async (version) => {
     const prs = await fetchTargeting(`release/v${version.majorMinorVersion}`);
+    console.info(
+      `Removing backport/* labels from PRs targeting v${version.majorMinorVersion}. The raw response from GitHub is:`,
+    );
+    console.info(JSON.stringify(prs));
     // PRs
     return removeBackportLabelsFromPrs(prs.items);
   }));
