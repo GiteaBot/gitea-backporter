@@ -2,6 +2,7 @@ import { lt, parse, valid } from "@std/semver";
 import { getPrBranchName } from "./git.ts";
 import { GiteaVersion } from "./giteaVersion.ts";
 import { backportPrExistsCache } from "./state.ts";
+import { PullRequest } from "./types.ts";
 
 const GITHUB_API = "https://api.github.com";
 const HEADERS = {
@@ -85,7 +86,9 @@ export const fetchPendingMerge = async () => {
 };
 
 // returns a list of PRs that target the given branch
-export const fetchTargeting = async (branch: string) => {
+export const fetchTargeting = async (
+  branch: string,
+): Promise<{ items: PullRequest[] }> => {
   const response = await fetch(
     `${GITHUB_API}/search/issues?q=` +
       encodeURIComponent(
