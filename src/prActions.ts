@@ -6,7 +6,14 @@ const execute = async (
   pr: { number: number; user: { login: string } },
 ) => {
   if (label === "giteabot/update-branch") {
-    await updateBranch(pr);
+    const err = await updateBranch(pr);
+    if (err) {
+      await addComment(
+        pr.number,
+        `I failed to update the branch because of the following error: ${err.message} Sorry about that. :tea:`,
+      );
+      return;
+    }
     await removeLabel(pr.number, "giteabot/update-branch");
   }
 };
@@ -27,6 +34,7 @@ export const updateBranch = async (
         `Failed to sync PR #${pr.number}`,
       );
       console.error(JSON.stringify(body));
+      return Error(JSON.stringify(body?.message));
     }
 
     console.info(
