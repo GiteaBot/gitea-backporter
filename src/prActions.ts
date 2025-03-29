@@ -8,7 +8,10 @@ const execute = async (
   if (label === "giteabot/update-branch") {
     const err = await updateBranch(pr);
     if (err) {
-      await addComment(pr.number, `I failed to update the branch because of the following error: ${err.message} Sorry about that. :tea:`);
+      await addComment(
+        pr.number,
+        `I failed to update the branch because of the following error: ${err.message} Sorry about that. :tea:`,
+      );
       return;
     }
     await removeLabel(pr.number, "giteabot/update-branch");
