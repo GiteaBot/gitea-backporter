@@ -6,7 +6,8 @@ export const commentIfTranslationsChanged = async (
   const prFileNamesSet = await fetchPrFileNames(pr.number);
   const prFileNames = Array.from(prFileNamesSet);
   const translationsChanged = prFileNames.some((fileName) =>
-    fileName.startsWith("options/locale/") && (fileName.endsWith(".ini") || fileName.endsWith(".json")) &&
+    fileName.startsWith("options/locale/") &&
+    (fileName.endsWith(".ini") || fileName.endsWith(".json")) &&
     !fileName.endsWith("en-US.ini")
   );
   if (translationsChanged) {
