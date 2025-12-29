@@ -8,7 +8,7 @@ export const commentIfTranslationsChanged = async (
   const translationsChanged = prFileNames.some((fileName) =>
     fileName.startsWith("options/locale/") &&
     (fileName.endsWith(".ini") || fileName.endsWith(".json")) &&
-    !fileName.endsWith("en-US.ini")
+    !fileName.endsWith("en-US.ini") && !fileName.endsWith("en-US.json")
   );
   if (translationsChanged) {
     const comment =
