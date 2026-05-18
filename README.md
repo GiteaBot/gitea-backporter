@@ -1,4 +1,4 @@
-# Gitea Pull Request Backporter
+# Gitea Pull Request Bot
 
 This is a script that does various maintenance chores for
 [go-gitea/gitea](https://github.com/go-gitea/gitea).
